@@ -222,7 +222,11 @@ export function settingsBody() {
 
   const seg = (action, opts, cur) => `<div class="seg">${opts.map(([v, l]) => `<button type="button" data-action="${action}" data-v="${v}" aria-pressed="${cur === v}">${esc(l)}</button>`).join('')}</div>`;
 
+  const app = S.app || {};
   return `<form data-form="settings" autocomplete="off">
+    <div class="set-row"><div class="set-label">${esc(t('settings.app'))}</div>
+      <div>${app.standalone ? `<span class="ok">● ${esc(t('settings.appRunning'))}</span>` : app.canInstall ? `<button class="btn sm primary" type="button" data-action="install">${esc(t('app.install'))}</button>` : ''}
+        <p>${esc(t('settings.appNote'))}</p>${app.standalone ? '' : `<p>${esc(t('settings.appHowto'))}</p>`}</div></div>
     <div class="set-row"><div class="set-label">${esc(t('settings.language'))}</div>
       <div>${seg('lang', [['tr', 'Türkçe'], ['en', 'English']], lang)}</div></div>
     <div class="set-row"><div class="set-label">${esc(t('settings.theme'))}</div>

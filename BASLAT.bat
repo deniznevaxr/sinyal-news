@@ -16,8 +16,8 @@ if errorlevel 1 (
 rem Sunucu zaten calisiyorsa yalnizca paneli ac.
 powershell -NoProfile -Command "try { Invoke-WebRequest -UseBasicParsing -TimeoutSec 2 http://localhost:4400/api/settings | Out-Null; exit 0 } catch { exit 1 }" >nul 2>nul
 if not errorlevel 1 (
-  echo  SINYAL zaten calisiyor, panel aciliyor...
-  start "" http://localhost:4400
+  echo  SINYAL zaten calisiyor, uygulama penceresi aciliyor...
+  start "" msedge --app=http://localhost:4400 --window-size=1440,920
   exit /b 0
 )
 

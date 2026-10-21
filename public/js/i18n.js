@@ -71,6 +71,10 @@ const STRINGS = {
     'drawer.related': 'Aynı haberi yazan diğer kaynaklar', 'drawer.similar': 'İlgili haberler', 'drawer.translatedBy': 'Otomatik çeviri',
     'drawer.published': 'Yayın', 'drawer.source': 'Kaynak', 'drawer.author': 'Yazar', 'drawer.category': 'Kategori',
     'events.count': '{n} etkinlik',
+    'app.install': 'Uygulamayı yükle', 'app.installed': 'SİNYAL yüklendi', 'app.installedText': 'Artık masaüstünden ve Başlat menüsünden kendi penceresinde açılıyor.',
+    'settings.app': 'Uygulama', 'settings.appNote': 'SİNYAL’i bilgisayarına ya da telefonuna uygulama olarak yükle: kendi simgesiyle, adres çubuğu olmadan kendi penceresinde açılır.',
+    'settings.appHowto': 'Chrome / Edge: adres çubuğunun sağındaki “Yükle” simgesi · Android: menü → Uygulamayı yükle · iPhone (Safari): Paylaş → Ana Ekrana Ekle',
+    'settings.appRunning': 'Şu an uygulama olarak açık.',
   },
   en: {
     tagline: 'Sound · Music · Visual tech news',
@@ -141,6 +145,10 @@ const STRINGS = {
     'drawer.related': 'Other outlets covering this story', 'drawer.similar': 'Related stories', 'drawer.translatedBy': 'Automatic translation',
     'drawer.published': 'Published', 'drawer.source': 'Source', 'drawer.author': 'Author', 'drawer.category': 'Category',
     'events.count': '{n} events',
+    'app.install': 'Install app', 'app.installed': 'SİNYAL installed', 'app.installedText': 'It now opens in its own window from your desktop and Start menu.',
+    'settings.app': 'App', 'settings.appNote': 'Install SİNYAL on your computer or phone: it opens in its own window with its own icon, no address bar.',
+    'settings.appHowto': 'Chrome / Edge: the “Install” icon at the right of the address bar · Android: menu → Install app · iPhone (Safari): Share → Add to Home Screen',
+    'settings.appRunning': 'Running as an app.',
   },
 };
 

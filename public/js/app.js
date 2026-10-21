@@ -67,8 +67,38 @@ async function loadAll() {
 
 function renderAll({ keepScroll = false } = {}) {
   renderChrome();
+  renderInstall();
   renderMain({ keepScroll });
   autoTranslate();
+}
+
+// ------------------------------------------------------------------ installable app (PWA)
+// Installed, SİNYAL opens in its own window with its own icon — no browser tab, no address bar.
+let installPrompt = null;
+const isStandalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+S.app = { canInstall: false, standalone: isStandalone() };
+
+function renderInstall() {
+  S.app = { canInstall: !!installPrompt, standalone: isStandalone() };
+  const btn = $('#install-btn');
+  btn.hidden = !installPrompt || S.app.standalone;
+  btn.querySelector('span').textContent = t('app.install');
+  btn.setAttribute('aria-label', t('app.install'));
+}
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  installPrompt = e;
+  renderInstall();
+});
+window.addEventListener('appinstalled', () => {
+  installPrompt = null;
+  renderInstall();
+  toast(t('app.installed'), t('app.installedText'));
+});
+
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || ['localhost', '127.0.0.1'].includes(location.hostname))) {
+  navigator.serviceWorker.register('sw.js').catch(() => { /* the app still works without it */ });
 }
 
 // ------------------------------------------------------------------ live mode (SSE)
@@ -414,6 +444,14 @@ const ACTIONS = {
     await translateOnDevice(todo, debounce(() => renderMain({ keepScroll: true }), 300));
   },
   newpill: () => { window.scrollTo({ top: 0, behavior: 'smooth' }); S.pendingNew = 0; refreshNewsList(); $('#newpill').innerHTML = ''; },
+  install: async () => {
+    if (!installPrompt) { openSettings(); return; }
+    installPrompt.prompt();
+    await installPrompt.userChoice.catch(() => {});
+    installPrompt = null;
+    renderInstall();
+    if (modalOpen()) openModal(t('settings.title'), settingsBody());
+  },
 };
 
 function runPalette(r, newTab) {
@@ -510,7 +548,11 @@ window.addEventListener('online', () => S.mode === 'live' && connect());
 // ------------------------------------------------------------------ boot
 async function boot() {
   applyPrefs();
+  // App shortcuts (manifest) open straight into a section: ./?section=news
+  const wanted = new URLSearchParams(location.search).get('section');
+  if ([...SECTIONS, 'saved'].includes(wanted)) S.section = wanted;
   renderChrome();
+  renderInstall();
   renderMain();
   try {
     await loadAll();

@@ -7,7 +7,12 @@
   <meta name="description" content="Ses, müzik ve görsel teknolojilerdeki gelişmeleri haber siteleri, GitHub, Hugging Face, arXiv, Hacker News, Reddit ve YouTube'dan toplayan, Türkçeye çeviren haber paneli.">
   <meta name="theme-color" content="#0c0d10">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="icons/icon-192.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <link rel="manifest" href="manifest.webmanifest">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="SİNYAL">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap">
@@ -32,6 +37,10 @@
       </a>
       <nav class="domains" id="domains" aria-label="Alan"></nav>
       <div class="top-tools">
+        <button class="install-btn" type="button" data-action="install" id="install-btn" hidden>
+          <svg class="i sm" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2.5v8M4.5 7 8 10.5 11.5 7M3 13.5h10"/></svg>
+          <span></span>
+        </button>
         <button class="search-btn" type="button" data-action="palette" id="search-btn">
           <svg class="i sm" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.75"/><path d="M10.5 10.5 14 14"/></svg>
           <span></span><kbd>Ctrl K</kbd>

@@ -270,9 +270,12 @@ function listen(port, attempt = 0) {
   });
 }
 
+// Opens SİNYAL in its own chromeless app window (Edge ships with Windows) rather than a browser tab.
 async function openBrowser(url) {
   const { spawn } = await import('node:child_process');
-  const cmd = process.platform === 'win32' ? ['cmd', ['/c', 'start', '', url]] : process.platform === 'darwin' ? ['open', [url]] : ['xdg-open', [url]];
+  const cmd = process.platform === 'win32'
+    ? ['cmd', ['/c', 'start', '', 'msedge', `--app=${url}`, '--window-size=1440,920']]
+    : process.platform === 'darwin' ? ['open', [url]] : ['xdg-open', [url]];
   spawn(cmd[0], cmd[1], { stdio: 'ignore', detached: true }).unref();
 }
 
