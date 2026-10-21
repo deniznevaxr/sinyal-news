@@ -3,14 +3,18 @@
 //   static — a published copy (GitHub Pages…): data.json is re-read every few minutes
 import { $, $$, esc, debounce, storage, copyText, safeUrl, HOUR, DAY } from './util.js';
 import { t, lang, setLang } from './i18n.js';
-import { ago } from './fmt.js';
+import { ago, agoLong } from './fmt.js';
 import { S, SECTIONS, persist, setItems, addItems, applyTranslations, setAnalysis, compileWatch, watchHits, getItem, visible, needsTranslation, titleOf } from './model.js';
 import { toast } from './ui.js';
 import { renderChrome, renderSections, renderStatus, renderSavedBadge, renderDomains } from './chrome.js';
 import { renderMain, refreshNewsList, showMore, boardItem } from './views.js';
-import { openDrawer, refreshDrawer, closeDrawer, openPalette, paletteOpen, paletteKey, paletteClick, openModal, closeModal, modalOpen, settingsBody, keysBody } from './overlays.js';
+import {
+  openDrawer, refreshDrawer, closeDrawer, openPalette, paletteOpen, paletteKey, paletteClick, openModal, closeModal, modalOpen, settingsBody, keysBody,
+  openSheet, closeSheet, sheetOpen, moreBody, layers, anyLayerOpen, closeTopLayer,
+} from './overlays.js';
 import { generateBrief, copyBrief, refreshBrief, toggleBrief } from './brief.js';
 import { probeDeviceTranslator, deviceTranslatorState, translateOnDevice } from './translate.js';
+import { phone, platform, autoHideHeader, pullToRefresh } from './mobile.js';
 
 const sessionStart = Date.now();
 let sel = -1;
@@ -77,7 +81,7 @@ function renderAll({ keepScroll = false } = {}) {
 // Installed, SİNYAL opens in its own window with its own icon — no browser tab, no address bar.
 // The Windows app (desktop/) counts as installed too.
 let installPrompt = null;
-const isStandalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true || !!window.sinyalDesktop;
+const isStandalone = () => platform.standalone() || !!window.sinyalDesktop;
 S.app = { canInstall: false, standalone: isStandalone() };
 
 function renderInstall() {
@@ -101,6 +105,8 @@ window.addEventListener('appinstalled', () => {
 
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || ['localhost', '127.0.0.1'].includes(location.hostname))) {
   navigator.serviceWorker.register('sw.js').catch(() => { /* the app still works without it */ });
+  // A tapped notification asks the open window to show its story.
+  navigator.serviceWorker.addEventListener('message', e => { if (e.data?.open) openDrawer(e.data.open); });
 }
 
 // ------------------------------------------------------------------ live mode (SSE)
@@ -152,17 +158,32 @@ function connect() {
 }
 
 // ------------------------------------------------------------------ static mode (polling)
-async function poll() {
+// Returns how many new stories arrived (0: nothing new, -1: could not reach the site).
+let lastPoll = 0;
+async function poll({ quiet = false } = {}) {
+  lastPoll = Date.now();
   try {
     const state = await getJSON(`data.json?t=${Date.now()}`);
-    if ((state.meta?.generatedAt || 0) <= (S.meta.generatedAt || 0)) return;
+    if ((state.meta?.generatedAt || 0) <= (S.meta.generatedAt || 0)) return 0;
     const known = new Set(S.items.keys());
     const fresh = (state.items || []).filter(it => !known.has(it.id));
     applyState(state);
-    onItems(fresh, !known.size);
+    onItems(fresh, quiet || !known.size);
     renderStatus();
     viewSoon([S.section]);
-  } catch { /* try again next round */ }
+    return fresh.length;
+  } catch {
+    return -1; // try again next round
+  }
+}
+
+// Pull-to-refresh in the installed phone app.
+async function pullRefresh() {
+  if (S.mode === 'live') { await refreshAll(); return; }
+  const n = await poll({ quiet: true });
+  if (n < 0) toast(t('toast.offline'), t('toast.offlineText'), { bad: true });
+  else if (n > 0) toast(t('toast.new', { n }));
+  else toast(t('ptr.uptodate'), `${t('status.static', { t: agoLong(S.meta.generatedAt) })} · ${t('ptr.next')}`);
 }
 
 // ------------------------------------------------------------------ incremental updates
@@ -248,10 +269,7 @@ const flushBatch = debounce(() => {
       const terms = watchHits(it).join(', ');
       toast(t('toast.watch', { terms }), titleOf(it), { onClick: () => openDrawer(it.id), ttl: 12000 });
       if (S.prefs.notify && typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-        try {
-          const n = new Notification(`SİNYAL · ${terms}`, { body: `${titleOf(it)}\n${it.sourceName}`, tag: it.id, icon: 'favicon.svg' });
-          n.onclick = () => { window.focus(); openDrawer(it.id); n.close(); };
-        } catch { /* notifications blocked */ }
+        notify(`SİNYAL · ${terms}`, `${titleOf(it)}\n${it.sourceName}`, it.id);
       }
     }
   } else {
@@ -272,9 +290,24 @@ function alerts(fresh) {
   flushBatch();
 }
 
+// Through the service worker where possible: Android only allows notifications from there.
+async function notify(title, body, id) {
+  const opts = { body, tag: id, icon: 'icons/icon-192.png', badge: 'icons/icon-192.png', data: { id } };
+  try {
+    const reg = await navigator.serviceWorker?.getRegistration();
+    if (reg) { await reg.showNotification(title, opts); return; }
+    const n = new Notification(title, opts);
+    n.onclick = () => { window.focus(); openDrawer(id); n.close(); };
+  } catch { /* notifications blocked */ }
+}
+
 document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) { unseen = 0; document.title = 'SİNYAL — Ses, Müzik ve Görsel Teknoloji Haberleri'; }
-  else rememberVisit();
+  if (!document.hidden) {
+    unseen = 0;
+    document.title = 'SİNYAL — Ses, Müzik ve Görsel Teknoloji Haberleri';
+    // Phones freeze background apps: catch up as soon as SİNYAL is back on screen.
+    if (S.mode === 'static' && Date.now() - lastPoll > 60e3) poll();
+  } else rememberVisit();
 });
 window.addEventListener('pagehide', rememberVisit);
 function rememberVisit() {
@@ -284,6 +317,7 @@ function rememberVisit() {
 
 // ------------------------------------------------------------------ navigation
 function setSection(s) {
+  closeSheet();
   S.section = [...SECTIONS, 'saved'].includes(s) ? s : 'home';
   persist('section');
   sel = -1;
@@ -293,7 +327,33 @@ function setSection(s) {
   renderMain();
   window.scrollTo(0, 0);
   autoTranslate();
+  syncBack();
 }
+
+// ------------------------------------------------------------------ back button / gesture
+// One extra history entry stands for "there is something to go back from": an open sheet,
+// or a section other than Gündem. The phone's back gesture then stays inside SİNYAL —
+// it closes the sheet, then returns to Gündem, and only then leaves.
+let trapped = !!history.state?.sinyal;
+let skipPop = 0;
+let syncQueued = false;
+function syncBack() {
+  if (syncQueued) return;
+  syncQueued = true;
+  queueMicrotask(() => { // after the whole action, so open-then-close never costs two entries
+    syncQueued = false;
+    const want = anyLayerOpen() || S.section !== 'home';
+    if (want && !trapped) { history.pushState({ sinyal: 1 }, ''); trapped = true; }
+    else if (!want && trapped) { trapped = false; skipPop++; history.back(); }
+  });
+}
+layers.onChange = syncBack;
+window.addEventListener('popstate', () => {
+  if (skipPop) { skipPop--; return; }
+  trapped = false;
+  if (!closeTopLayer() && S.section !== 'home') setSection('home');
+  syncBack();
+});
 
 function setDomain(d) {
   S.domain = d;
@@ -350,6 +410,24 @@ function copyLink(id) {
   if (it) copyText(`${titleOf(it)} — ${it.url}`).then(() => toast(t('toast.copied'), t('toast.copiedText')));
 }
 
+// The phone's own share sheet (WhatsApp, Messages, copy…), with the Turkish headline.
+async function shareItem(id) {
+  const it = getItem(id);
+  const url = it && safeUrl(it.url);
+  if (!url) return;
+  try {
+    await navigator.share({ title: titleOf(it), text: titleOf(it), url });
+  } catch (e) {
+    if (e?.name !== 'AbortError') copyLink(id);
+  }
+}
+
+// A setting changed while a sheet shows it: redraw that sheet in place.
+function refreshOverlays() {
+  if (modalOpen()) openModal(t('settings.title'), settingsBody());
+  if (sheetOpen()) openSheet(moreBody());
+}
+
 async function post(url, body) {
   const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) });
   const j = await r.json().catch(() => ({}));
@@ -383,6 +461,7 @@ async function toggleNotify() {
 }
 
 async function openSettings() {
+  closeSheet();
   if (S.mode === 'live') { try { S.settings = await getJSON('api/settings'); } catch { /* keep last */ } }
   openModal(t('settings.title'), settingsBody());
 }
@@ -392,7 +471,7 @@ function changeLang(l) {
   applyPrefs();
   renderAll({ keepScroll: true });
   refreshDrawer();
-  if (modalOpen()) openModal(t('settings.title'), settingsBody());
+  refreshOverlays();
 }
 
 const ACTIONS = {
@@ -401,11 +480,18 @@ const ACTIONS = {
   'close-drawer': () => closeDrawer(),
   home: () => setSection('home'),
   domain: el => setDomain(el.dataset.v),
-  section: el => setSection(el.dataset.v),
+  section: el => {
+    // Tapping the tab you are already on scrolls back to the top, as in native apps.
+    if (el.classList.contains('tab') && S.section === el.dataset.v && !sheetOpen()) { window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+    setSection(el.dataset.v);
+  },
+  'more-sheet': () => { if (!closeSheet()) openSheet(moreBody()); },
+  share: el => shareItem(el.dataset.id),
+  'install-dismiss': () => { storage.set('installHidden', true); renderMain({ keepScroll: true }); },
   topic: el => { S.topic = el.dataset.v || null; persist('topic'); renderMain({ keepScroll: true }); autoTranslate(); },
   lang: el => changeLang(el.dataset.v),
   theme: () => { S.prefs.theme = resolvedTheme() === 'dark' ? 'light' : 'dark'; persist('prefs'); applyPrefs(); },
-  'set-theme': el => { S.prefs.theme = el.dataset.v; persist('prefs'); applyPrefs(); openModal(t('settings.title'), settingsBody()); },
+  'set-theme': el => { S.prefs.theme = el.dataset.v; persist('prefs'); applyPrefs(); refreshOverlays(); },
   palette: () => openPalette(),
   search: el => { S.feed.q = el.dataset.v; S.topic = null; if (S.feed.range === '1d') S.feed.range = '3d'; setSection('news'); },
   range: el => { S.feed.range = el.dataset.v; persist('feed'); renderMain(); },
@@ -423,7 +509,7 @@ const ACTIONS = {
     S.prefs.sound = !S.prefs.sound;
     persist('prefs');
     if (S.prefs.sound) blip('watch');
-    if (modalOpen()) openModal(t('settings.title'), settingsBody());
+    refreshOverlays();
   },
   settings: () => openSettings(),
   keys: () => openModal(t('keys.title'), keysBody()),
@@ -452,7 +538,8 @@ const ACTIONS = {
     await installPrompt.userChoice.catch(() => {});
     installPrompt = null;
     renderInstall();
-    if (modalOpen()) openModal(t('settings.title'), settingsBody());
+    refreshOverlays();
+    renderMain({ keepScroll: true });
   },
 };
 
@@ -467,6 +554,7 @@ document.addEventListener('click', e => {
   if (paletteOpen()) { paletteClick(e, runPalette); return; }
   if (e.target.id === 'scrim') { closeDrawer(); return; }
   if (e.target.id === 'modal') { closeModal(); return; }
+  if (e.target.id === 'sheet') { closeSheet(); return; }
   const el = e.target.closest('[data-action]');
   if (!el) return;
   const link = e.target.closest('a[href]');
@@ -522,7 +610,7 @@ document.addEventListener('change', e => {
 document.addEventListener('keydown', e => {
   if (paletteOpen()) { paletteKey(e, runPalette); return; }
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); openPalette(); return; }
-  if (e.key === 'Escape') { if (closeModal() || closeDrawer()) return; document.activeElement?.blur?.(); return; }
+  if (e.key === 'Escape') { if (closeTopLayer()) return; document.activeElement?.blur?.(); return; }
   const tg = e.target;
   if (tg.closest?.('input, textarea, select, [contenteditable="true"]') || modalOpen()) return;
   if (e.ctrlKey || e.metaKey || e.altKey) return;
@@ -550,12 +638,25 @@ window.addEventListener('online', () => S.mode === 'live' && connect());
 // ------------------------------------------------------------------ boot
 async function boot() {
   applyPrefs();
-  // App shortcuts (manifest) open straight into a section: ./?section=news
-  const wanted = new URLSearchParams(location.search).get('section');
+  // App shortcuts (manifest) open straight into a section: ./?section=news; a tapped
+  // notification opens its story: ./?open=<id>. The address is tidied up afterwards.
+  const params = new URLSearchParams(location.search);
+  const wanted = params.get('section');
+  const openId = params.get('open');
   if ([...SECTIONS, 'saved'].includes(wanted)) S.section = wanted;
+  if (location.search) history.replaceState(history.state, '', location.pathname + location.hash);
   renderChrome();
   renderInstall();
   renderMain();
+  syncBack();
+
+  // Phones: the header tucks away while reading; pull down to refresh in the installed app.
+  const header = $('.top');
+  autoHideHeader(header);
+  new ResizeObserver(() => document.documentElement.style.setProperty('--head-h', `${header.offsetHeight}px`)).observe(header);
+  pullToRefresh(pullRefresh, { blocked: anyLayerOpen, labels: { pull: () => t('ptr.pull'), release: () => t('ptr.release'), loading: () => t('ptr.loading') } });
+  phone.addEventListener?.('change', () => { renderMain({ keepScroll: true }); refreshDrawer(); });
+
   try {
     await loadAll();
   } catch {
@@ -563,8 +664,9 @@ async function boot() {
     toast(t('toast.offline'), t('toast.offlineText'), { bad: true, ttl: 15000 });
   }
   renderAll();
+  if (openId) openDrawer(openId);
   if (S.mode === 'live') connect();
-  else setInterval(poll, 5 * 60e3);
+  else { lastPoll = Date.now(); setInterval(poll, 5 * 60e3); }
   probeDeviceTranslator().then(() => { if (lang === 'tr') renderMain({ keepScroll: true }); autoTranslate(); });
   // Relative times and the status line drift with the clock.
   setInterval(() => {

@@ -18,10 +18,21 @@ Ses, müzik ve görsel teknolojilerdeki gelişmeleri **90 kaynaktan** (51 haber 
 SİNYAL bir web uygulamasıdır: bir kez yükleyince masaüstünde ve Başlat menüsünde kendi simgesiyle durur, adres çubuğu olmadan kendi penceresinde açılır. Haberleri internetten alır; bilgisayarında hiçbir sunucu çalıştırman gerekmez ve son haberler internet yokken de okunabilir.
 
 - **Bilgisayar (Chrome / Edge):** https://deniznevaxr.github.io/sinyal-news/ adresini aç → sayfadaki **Uygulamayı yükle** düğmesine ya da adres çubuğunun sağındaki yükle simgesine bas.
-- **Android (Chrome):** menü (⋮) → **Uygulamayı yükle**.
-- **iPhone (Safari):** Paylaş → **Ana Ekrana Ekle**.
+- **Android (Chrome):** adresi aç → Gündem'deki kartta **Yükle**'ye bas (ya da menü ⋮ → **Uygulamayı yükle**).
+- **iPhone (Safari):** adresi Safari'de aç → **Paylaş** → **Ana Ekrana Ekle**. Gündem'deki kart adımları gösterir.
 
 Arkadaşına da yalnızca bu adresi göndermen yeterli.
+
+### Telefonda
+
+Telefonda SİNYAL bir telefon uygulaması gibi çalışır:
+- Altta **Gündem · Haberler · Videolar · Araçlar · Daha** menüsü bulunur. Makaleler, Topluluk, Kaydedilenler, dil, tema ve ayarlar **Daha**'nın altındadır.
+- Haber ayrıntısı, arama ve ayarlar alttan açılan sayfalardır; aşağı kaydırınca kapanırlar.
+- Android'de geri hareketi önce açık sayfayı kapatır, sonra Gündem'e döner.
+- **Paylaş** düğmesi haberi WhatsApp ve Mesajlar gibi uygulamalarla Türkçe başlığıyla gönderir.
+- Okurken üst kısım gizlenerek yer açar.
+- Ana ekrandan açınca sayfayı aşağı çekip yenileyebilirsin; uygulamaya her dönüşte haberler de kendiliğinden yenilenir.
+- iPhone'un çentiğine ve alt çizgisine uyar, açık ve koyu temada çalışır, açılışta kendi ekranını gösterir.
 
 ### Windows uygulaması (.exe)
 

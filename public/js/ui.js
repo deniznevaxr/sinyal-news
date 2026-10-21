@@ -3,6 +3,7 @@ import { $, esc, safeUrl, highlight } from './util.js';
 import { t } from './i18n.js';
 import { ago, compact } from './fmt.js';
 import { S, TOPIC_DOMAIN, titleOf, summaryOf, isNew, watchHits } from './model.js';
+import { platform, shareGlyph } from './mobile.js';
 
 const ICONS = {
   ext: '<path d="M9 2.5h4.5V7M13.5 2.5 7.5 8.5M12 9.5v4H2.5V4h4"/>',
@@ -20,6 +21,15 @@ const ICONS = {
   search: '<circle cx="7" cy="7" r="4.75"/><path d="M10.5 10.5 14 14"/>',
   refresh: '<path d="M13.5 8A5.5 5.5 0 1 1 11.9 4.1"/><path d="M13.6 2.2v3.1h-3.1"/>',
   star: '<path d="m8 2 1.8 3.8 4.2.5-3.1 2.9.8 4.1L8 11.3l-3.7 2 .8-4.1L2 6.3l4.2-.5z"/>',
+  home: '<path d="M2.5 7 8 2.5 13.5 7v6.5H9.8v-4H6.2v4H2.5z"/>',
+  news: '<rect x="2.5" y="2.5" width="11" height="11" rx="1.8"/><path d="M5 5.6h6M5 8h6M5 10.4h3.6"/>',
+  video: '<rect x="1.8" y="3.5" width="12.4" height="9" rx="2"/><path d="m6.8 6.2 3.1 1.8-3.1 1.8z"/>',
+  cube: '<path d="M8 1.8 13.5 5v6L8 14.2 2.5 11V5z"/><path d="M2.5 5 8 8.2 13.5 5M8 8.2v6"/>',
+  dots: '<circle cx="3.3" cy="8" r="1.15" fill="currentColor"/><circle cx="8" cy="8" r="1.15" fill="currentColor"/><circle cx="12.7" cy="8" r="1.15" fill="currentColor"/>',
+  share: '<path d="M8 1.8v8.2M5.2 4.4 8 1.6l2.8 2.8"/><path d="M5.6 6.6H4.2v7.6h7.6V6.6h-1.4"/>',
+  chev: '<path d="m6 3.5 4.5 4.5L6 12.5"/>',
+  sliders: '<path d="M2 4.5h7M12 4.5h2M2 11.5h2M7 11.5h7"/><circle cx="10.5" cy="4.5" r="1.6"/><circle cx="5.5" cy="11.5" r="1.6"/>',
+  download: '<path d="M8 2.5v8M4.5 7 8 10.5 11.5 7M3 13.5h10"/>',
 };
 export const icon = (name, cls = 'i sm') => `<svg class="${cls}" viewBox="0 0 16 16" aria-hidden="true">${ICONS[name] || ''}</svg>`;
 
@@ -89,6 +99,25 @@ export function video(v, now = Date.now()) {
     <div class="video-title">${esc(titleOf(v))}</div>
     <div class="video-meta"><span>${esc(v.sourceName)}</span><span data-ts="${v.published}">${esc(ago(v.published, now))}</span>${v.metrics?.views ? `<span>${esc(t('meta.views', { n: compact(v.metrics.views) }))}</span>` : ''}</div>
   </article>`;
+}
+
+// "Add SİNYAL to your home screen", told the way this phone's browser does it.
+// bare: just the steps (Settings); dismissable: with a "later" button (the Gündem card).
+export function installCard({ dismissable = false, bare = false } = {}) {
+  const app = S.app || {};
+  if (app.standalone) return '';
+  const action = app.canInstall && !bare ? `<button class="btn primary" type="button" data-action="install">${icon('download')}${esc(t('install.button'))}</button>` : '';
+  let help = '';
+  if (!app.canInstall) {
+    if (platform.inApp) help = `<p>${esc(t('install.inApp'))}</p>`;
+    else if (platform.ios) help = `<ol class="install-steps"><li>${esc(t(platform.iosSafari ? 'install.ios1' : 'install.iosOther', { icon: '§' })).replace('§', shareGlyph())}</li><li>${esc(t('install.ios2'))}</li></ol>`;
+    else if (platform.android) help = `<p>${esc(t('install.android'))}</p>`;
+  }
+  if (bare) return help;
+  if (!action && !help) return ''; // computers: the header button and Settings cover it
+  const later = dismissable ? `<button class="btn ghost" type="button" data-action="install-dismiss">${esc(t(action ? 'install.later' : 'install.ok'))}</button>` : '';
+  return `<section class="install-card"><img class="app-ico" src="icons/icon-192.png" alt="" width="48" height="48">
+    <div><h3>${esc(t('install.title'))}</h3><p>${esc(t('install.text'))}</p>${help}${action || later ? `<div class="install-actions">${action}${later}</div>` : ''}</div></section>`;
 }
 
 export function empty(title, sub, loading = false) {

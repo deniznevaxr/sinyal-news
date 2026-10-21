@@ -1,14 +1,15 @@
 // Page renderers for each section. Rows carry data-nav for keyboard travel.
-import { $, esc, safeUrl, DAY, HOUR } from './util.js';
+import { $, esc, safeUrl, storage, DAY, HOUR } from './util.js';
 import { t } from './i18n.js';
 import { ago, agoLong, compact, dayMonth } from './fmt.js';
 import {
   S, DOMAINS, TOPICS_BY_DOMAIN, RANGES, feedItems, score, visible, inDomain, boardVisible, queryTerms,
   topicCounts, titleOf, summaryOf, watchHits, needsTranslation,
 } from './model.js';
-import { item, mini, video, empty, icon, kicker, tags, domainOf } from './ui.js';
+import { item, mini, video, empty, icon, kicker, tags, domainOf, installCard } from './ui.js';
 import { briefBlock } from './brief.js';
 import { deviceTranslatorState } from './translate.js';
+import { phone } from './mobile.js';
 
 const PAGE = 60;
 let limit = PAGE;
@@ -93,6 +94,7 @@ function home() {
   const vids = S.list.filter(i => i.kind === 'video' && visible(i) && !(i.extra?.short)).slice(0, 4);
 
   const main = `
+    ${phone.matches && !storage.get('installHidden', false) ? installCard({ dismissable: true }) : ''}
     ${briefBlock()}
     ${translationNotice([...stories.map(s => s.it), ...latest, ...popular])}
     ${chips()}

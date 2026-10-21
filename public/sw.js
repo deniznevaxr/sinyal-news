@@ -1,10 +1,10 @@
 // Service worker: makes SİNYAL installable as an app and keeps the last news readable offline.
 // Strategy is network-first, so a new deploy or a fresh data.json always wins when online.
-const CACHE = 'sinyal-v2';
+const CACHE = 'sinyal-v3';
 const SHELL = [
   './', 'index.html', 'manifest.webmanifest', 'favicon.svg', 'css/app.css',
   'icons/icon-192.png', 'icons/icon-512.png',
-  'js/app.js', 'js/brief.js', 'js/chrome.js', 'js/fmt.js', 'js/i18n.js', 'js/model.js', 'js/overlays.js',
+  'js/app.js', 'js/brief.js', 'js/chrome.js', 'js/fmt.js', 'js/i18n.js', 'js/mobile.js', 'js/model.js', 'js/overlays.js',
   'js/text.js', 'js/translate.js', 'js/ui.js', 'js/util.js', 'js/views.js',
 ];
 
@@ -21,6 +21,21 @@ self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     for (const key of await caches.keys()) if (key !== CACHE) await caches.delete(key);
     await self.clients.claim();
+  })());
+});
+
+// A tapped watch-list notification opens its story: in the open window if there is one.
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  const id = event.notification.data?.id;
+  event.waitUntil((async () => {
+    const [win] = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    if (win) {
+      await win.focus();
+      if (id) win.postMessage({ open: id });
+      return;
+    }
+    await self.clients.openWindow(id ? `./?open=${encodeURIComponent(id)}` : './');
   })());
 });
 

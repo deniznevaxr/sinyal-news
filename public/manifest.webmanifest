@@ -12,11 +12,18 @@
   "background_color": "#0c0d10",
   "theme_color": "#0c0d10",
   "categories": ["news", "music", "productivity"],
+  "launch_handler": { "client_mode": ["focus-existing", "auto"] },
   "icons": [
     { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
     { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
     { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ],
+  "screenshots": [
+    { "src": "screenshots/narrow-gundem.jpg", "sizes": "1080x2160", "type": "image/jpeg", "form_factor": "narrow", "label": "Gündem: günün özeti ve birden çok kaynağın yazdığı haberler" },
+    { "src": "screenshots/narrow-haberler.jpg", "sizes": "1080x2160", "type": "image/jpeg", "form_factor": "narrow", "label": "Haberler: Türkçe başlıklar, Ses · Müzik · Görsel alanları" },
+    { "src": "screenshots/narrow-haber.jpg", "sizes": "1080x2160", "type": "image/jpeg", "form_factor": "narrow", "label": "Haber ayrıntısı: Türkçe özet, kaydet ve paylaş" },
+    { "src": "screenshots/wide-gundem.jpg", "sizes": "1920x1200", "type": "image/jpeg", "form_factor": "wide", "label": "SİNYAL bilgisayarda" }
   ],
   "shortcuts": [
     { "name": "Haberler", "url": "./?section=news", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },

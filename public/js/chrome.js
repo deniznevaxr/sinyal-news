@@ -1,8 +1,10 @@
-// Header chrome: field tabs, section tabs, language switch and the live status line.
+// Header chrome: field tabs, section tabs, language switch, the live status line and,
+// on phones, the bottom tab bar.
 import { $, $$, esc } from './util.js';
 import { t, lang } from './i18n.js';
 import { agoLong } from './fmt.js';
 import { S, DOMAINS, SECTIONS, isNew, inDomain } from './model.js';
+import { icon } from './ui.js';
 
 export function renderChrome() {
   $('#tagline').textContent = t('tagline');
@@ -30,6 +32,18 @@ export function renderSections() {
   $('#sections').innerHTML = SECTIONS.map(s => {
     const count = s === 'news' && fresh ? `<span class="count hot">${fresh > 99 ? '99+' : fresh}</span>` : '';
     return `<button class="section-btn" type="button" data-action="section" data-v="${s}" ${S.section === s ? 'aria-current="page"' : ''}>${esc(t(`section.${s}`))}${count}</button>`;
+  }).join('');
+  renderTabbar(fresh);
+}
+
+// Phones: four main sections plus "More" (papers, community, saved, settings).
+const TABS = [['home', 'home'], ['news', 'news'], ['videos', 'video'], ['tools', 'cube'], ['more', 'dots']];
+function renderTabbar(fresh) {
+  const inMore = ['papers', 'community', 'saved'].includes(S.section);
+  $('#tabbar').innerHTML = TABS.map(([s, ic]) => {
+    const current = s === 'more' ? inMore : S.section === s;
+    const count = s === 'news' && fresh ? `<span class="count">${fresh > 99 ? '99+' : fresh}</span>` : '';
+    return `<button class="tab" type="button" data-action="${s === 'more' ? 'more-sheet' : 'section'}" data-v="${s}" ${current ? 'aria-current="page"' : ''}><span class="tab-ico">${icon(ic, 'i')}</span><span>${esc(t(`tab.${s}`))}</span>${count}</button>`;
   }).join('');
 }
 
