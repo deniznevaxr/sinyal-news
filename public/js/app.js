@@ -25,6 +25,7 @@ function applyPrefs() {
   document.documentElement.dataset.theme = resolvedTheme();
   document.documentElement.lang = lang;
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', resolvedTheme() === 'light' ? '#eef0f2' : '#0c0d10');
+  window.sinyalDesktop?.setTheme(S.prefs.theme); // Windows app: the title bar follows the theme
 }
 matchMedia('(prefers-color-scheme: light)').addEventListener?.('change', () => S.prefs.theme === 'system' && applyPrefs());
 
@@ -74,8 +75,9 @@ function renderAll({ keepScroll = false } = {}) {
 
 // ------------------------------------------------------------------ installable app (PWA)
 // Installed, SİNYAL opens in its own window with its own icon — no browser tab, no address bar.
+// The Windows app (desktop/) counts as installed too.
 let installPrompt = null;
-const isStandalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const isStandalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true || !!window.sinyalDesktop;
 S.app = { canInstall: false, standalone: isStandalone() };
 
 function renderInstall() {

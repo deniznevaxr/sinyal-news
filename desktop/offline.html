@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src https: http:">
+<title>SİNYAL</title>
+<style>
+  :root { color-scheme: dark; --bg: #0c0d10; --card: #15181d; --line: #23272e; --line-2: #323741; --text: #edece7; --text-3: #85837c; --accent: #c8f53c; }
+  @media (prefers-color-scheme: light) {
+    :root { color-scheme: light; --bg: #eef0f2; --card: #ffffff; --line: #dcdfe3; --line-2: #c8ccd2; --text: #121418; --text-3: #686d76; --accent: #4b6900; }
+  }
+  html, body { height: 100%; margin: 0; }
+  body { display: grid; place-items: center; background: var(--bg); color: var(--text); font: 15px/1.55 "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif; }
+  main { max-width: 400px; padding: 32px 24px; text-align: center; }
+  svg { width: 46px; height: 40px; color: var(--accent); }
+  h1 { margin: 20px 0 8px; font-size: 20px; font-weight: 650; letter-spacing: -0.01em; }
+  p { margin: 0 0 24px; color: var(--text-3); }
+  button { font: inherit; font-weight: 600; padding: 8px 20px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--card); color: var(--text); cursor: pointer; }
+  button:hover { border-color: var(--accent); }
+  button:disabled { opacity: 0.6; cursor: default; }
+</style>
+</head>
+<body>
+<main>
+  <svg viewBox="0 0 23 20" aria-hidden="true"><g fill="currentColor">
+    <rect x="0" y="7" width="3" height="6" rx="1.2"/><rect x="5" y="3" width="3" height="14" rx="1.2"/><rect x="10" y="0" width="3" height="20" rx="1.2"/><rect x="15" y="4" width="3" height="12" rx="1.2"/><rect x="20" y="7" width="3" height="6" rx="1.2"/>
+  </g></svg>
+  <h1>İnternete bağlanılamadı</h1>
+  <p>SİNYAL haberleri internetten alır. Bağlantı gelince kendiliğinden açılacak.</p>
+  <button type="button" id="retry">Tekrar dene</button>
+</main>
+<script>
+  // Opens SİNYAL as soon as the site answers again.
+  const target = new URLSearchParams(location.search).get('u') || '';
+  const retry = document.getElementById('retry');
+  async function tryOpen() {
+    if (retry.disabled || !/^https?:\/\//.test(target)) return;
+    retry.disabled = true;
+    retry.textContent = 'Bağlanılıyor…';
+    try {
+      await fetch(new URL('manifest.webmanifest', target), { mode: 'no-cors', cache: 'no-store' });
+      location.replace(target);
+    } catch {
+      retry.disabled = false;
+      retry.textContent = 'Tekrar dene';
+    }
+  }
+  retry.addEventListener('click', tryOpen);
+  addEventListener('online', tryOpen);
+  setInterval(tryOpen, 8000);
+</script>
+</body>
+</html>

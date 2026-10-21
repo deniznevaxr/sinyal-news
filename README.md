@@ -23,6 +23,14 @@ SİNYAL bir web uygulamasıdır: bir kez yükleyince masaüstünde ve Başlat me
 
 Arkadaşına da yalnızca bu adresi göndermen yeterli.
 
+### Windows kurulum dosyası (.exe)
+
+Link yerine dosya göndermek istersen: **`SINYAL-Kurulum-1.0.0.exe`**. Çift tıklayınca birkaç saniyede kurulur, masaüstüne ve Başlat menüsüne **SİNYAL** simgesini ekler ve uygulamayı açar. Yönetici izni istemez; kaldırmak için **Ayarlar → Uygulamalar → SİNYAL → Kaldır**.
+
+- Uygulama, yukarıdaki internet sürümünü kendi penceresinde açar. Haberler ve arayüz güncellemeleri internetten gelir; .exe'yi yeniden göndermen gerekmez.
+- Dosya dijital olarak imzalı olmadığı için Windows ilk açılışta “Windows bilgisayarınızı korudu” diyebilir: **Ek bilgi → Yine de çalıştır**. Tarayıcı indirirken uyarırsa **Sakla**'yı seç.
+- Dosyayı yeniden üretmek için `desktop` klasöründe `npm install`, ardından `npm run dist` → `desktop/dist/SINYAL-Kurulum-1.0.0.exe`.
+
 ## 1. Kendi bilgisayarında çalıştır
 
 1. **`BASLAT.bat`** dosyasına çift tıkla (Node.js 18.17+ gerekir; bu bilgisayarda kurulu).
@@ -113,6 +121,7 @@ lib/analyze.js       yükselen konular, çok kaynaklı haber kümeleri
 lib/translate.js     Türkçe çeviri (önbellekli, hız sınırına saygılı)
 lib/brief.js         isteğe bağlı Claude özeti
 public/              arayüz — derleme adımı yok, saf ES modülleri
+desktop/             Windows uygulaması: yayındaki siteyi açan Electron kabuğu → SINYAL-Kurulum.exe
 config/              kaynak listesi ve etkinlik takvimi
 .github/workflows/   GitHub Pages'e otomatik yayın
 ```

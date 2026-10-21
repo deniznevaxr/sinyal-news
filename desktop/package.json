@@ -1,0 +1,60 @@
+{
+  "name": "sinyal",
+  "productName": "SINYAL",
+  "version": "1.0.0",
+  "description": "SİNYAL — ses, müzik ve görsel teknoloji haberleri",
+  "author": "deniznevaxr",
+  "homepage": "https://deniznevaxr.github.io/sinyal-news/",
+  "private": true,
+  "type": "module",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win --x64 --publish never"
+  },
+  "devDependencies": {
+    "electron": "44.9.3",
+    "electron-builder": "26.15.3"
+  },
+  "build": {
+    "appId": "com.nevaxr.sinyal",
+    "productName": "SINYAL",
+    "executableName": "Sinyal",
+    "copyright": "© 2026 deniznevaxr",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.cjs",
+      "offline.html",
+      "build/icon.ico",
+      "package.json"
+    ],
+    "electronLanguages": [
+      "tr",
+      "en-US"
+    ],
+    "compression": "maximum",
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "shortcutName": "SİNYAL",
+      "uninstallDisplayName": "SİNYAL",
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "runAfterFinish": true,
+      "deleteAppDataOnUninstall": false,
+      "installerLanguages": [
+        "tr_TR"
+      ],
+      "language": "1055",
+      "artifactName": "SINYAL-Kurulum-${version}.${ext}"
+    }
+  }
+}
