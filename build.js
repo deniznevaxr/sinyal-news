@@ -55,13 +55,17 @@ if (due.length) {
   log(`tarama bitti · ${fresh} yeni haber${failed.length ? ` · hatalı: ${failed.join(', ')}` : ''}`);
 }
 
-// 2. Translate (the endpoint is paced inside the translator).
+// 2. Analyse, then translate (paced inside the translator): the multi-source stories the
+//    front page features go first, so a big backlog never leaves the headlines in English.
+const analysis = analyze(store.list());
 const translator = new Translator(store);
-const translated = await translator.run({ max: process.env.TRANSLATE_MAX !== undefined ? Number(process.env.TRANSLATE_MAX) : 400 });
+const translated = await translator.run({
+  max: process.env.TRANSLATE_MAX !== undefined ? Number(process.env.TRANSLATE_MAX) : 400,
+  first: analysis.clusters.flatMap(c => c.ids),
+});
 log(`çeviri: ${translated} haber${translator.lastError ? ` · durdu: ${translator.lastError}` : ''}`);
 
-// 3. Analyse and (optionally) brief.
-const analysis = analyze(store.list());
+// 3. (Optionally) brief.
 const briefer = new Briefer(DATA, secrets);
 if (secrets.anthropicKey && briefer.isStale(BRIEF_HOURS)) {
   try {

@@ -56,7 +56,11 @@ setInterval(scheduleAnalysis, 10 * 60e3); // day buckets roll over even when qui
 let translateTimer = null;
 function translateSoon() {
   clearTimeout(translateTimer);
-  translateTimer = setTimeout(() => translator.run({ max: 150, onBatch: changed => broadcast('tr', changed) }), 1500);
+  translateTimer = setTimeout(() => translator.run({
+    max: 150,
+    first: analysis.clusters.flatMap(c => c.ids), // featured stories before the rest
+    onBatch: changed => broadcast('tr', changed),
+  }), 1500);
 }
 setInterval(translateSoon, 3 * 60e3);
 
