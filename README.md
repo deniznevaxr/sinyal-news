@@ -6,18 +6,30 @@ Ses, müzik ve görsel teknolojilerdeki gelişmeleri **90 kaynaktan** (51 haber 
 
 | | Kendi bilgisayarında | İnternette (arkadaşına link) |
 |---|---|---|
-| Nasıl açılır | `BASLAT.bat` → http://localhost:4400 | https://deniznevaxr.github.io/sinyal-news/ |
+| Nasıl açılır | `BASLAT.bat` → kendi uygulama penceresinde açılır | https://deniznevaxr.github.io/sinyal-news/ → **Uygulamayı yükle** |
 | Güncelleme | anlık (yeni haber düştüğü an) | ~20 dakikada bir, otomatik |
 | Bilgisayarın açık olmalı mı | evet | hayır |
 | Kim görebilir | yalnızca sen | linki olan herkes (telefonda da) |
 
 ---
 
+## Uygulama olarak yükle (önerilen)
+
+SİNYAL bir web uygulamasıdır: bir kez yükleyince masaüstünde ve Başlat menüsünde kendi simgesiyle durur, adres çubuğu olmadan kendi penceresinde açılır. Haberleri internetten alır; bilgisayarında hiçbir sunucu çalıştırman gerekmez ve son haberler internet yokken de okunabilir.
+
+- **Bilgisayar (Chrome / Edge):** https://deniznevaxr.github.io/sinyal-news/ adresini aç → sayfadaki **Uygulamayı yükle** düğmesine ya da adres çubuğunun sağındaki yükle simgesine bas.
+- **Android (Chrome):** menü (⋮) → **Uygulamayı yükle**.
+- **iPhone (Safari):** Paylaş → **Ana Ekrana Ekle**.
+
+Arkadaşına da yalnızca bu adresi göndermen yeterli.
+
 ## 1. Kendi bilgisayarında çalıştır
 
 1. **`BASLAT.bat`** dosyasına çift tıkla (Node.js 18.17+ gerekir; bu bilgisayarda kurulu).
-2. Tarayıcıda panel açılır. İlk tarama birkaç dakika sürer; haberler geldikçe ekran dolar.
+2. SİNYAL ayrı bir uygulama penceresinde açılır. İlk tarama birkaç dakika sürer; haberler geldikçe ekran dolar.
 3. Konsol penceresi açık kaldıkça tarama sürer. Kapatınca durur; veriler `data/` klasöründe kalır.
+
+Yerel sürümün farkı: haberler 20 dakika beklemeden, düştüğü an gelir ve yapay zekâ özetini istediğin an oluşturabilirsin.
 
 ## 2. İnternette yayınla (arkadaşın linkten açsın)
 
@@ -30,7 +42,7 @@ Site GitHub'ın **GitHub Pages** hizmetinde yayınlanır: https://github.com/den
 
 Notlar:
 - Repo ve site herkese açıktır; içinde yalnızca kod ve haberler bulunur. `data/` klasörün (önbellek, varsa kaydettiğin API anahtarları) `.gitignore` sayesinde yüklenmez.
-- GitHub, 60 gün boyunca repoda hiç değişiklik olmazsa zamanlanmış çalışmayı durdurur. Bu durumda **Actions** sekmesinden iş akışını tekrar etkinleştir.
+- GitHub, 60 gün boyunca repoda hiç değişiklik olmazsa zamanlanmış çalışmayı durdurur. İş akışı bunu önlemek için günde bir kez kendini yeniden etkinleştirir; yine de bir gün GitHub'dan “scheduled workflow disabled” e-postası gelirse **Actions** sekmesinden **Enable workflow** demen yeterli.
 - Yayındaki sürümde ziyaretçiler ayarları ve API anahtarlarını göremez veya değiştiremez.
 
 **Anlık güncellenen bir sunucu istersen:** klasördeki `Dockerfile` ile Render, Fly.io veya Hugging Face Spaces (Docker) gibi bir hizmette `server.js` yayın modunda (`PUBLIC=1`) çalışır.

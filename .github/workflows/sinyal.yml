@@ -4,7 +4,10 @@ name: SİNYAL — güncelle ve yayınla
 
 on:
   schedule:
-    - cron: "*/20 * * * *"
+    # Saat başları GitHub'da en yoğun an olduğu için dakikalar kaydırıldı.
+    - cron: "4,24,44 * * * *"
+    # Günde bir: aşağıdaki keepalive işi.
+    - cron: "13 3 * * *"
   workflow_dispatch:
   push:
     branches: [main]
@@ -67,3 +70,17 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+
+  # GitHub, 60 gün boyunca hiç değişiklik olmayan repolarda zamanlanmış çalışmayı kapatır.
+  # Bu iş günde bir kez iş akışını yeniden etkinleştirerek o süreyi sıfırlar. Commit atmaz,
+  # böylece bilgisayarındaki kopyadan yaptığın `git push` hiçbir zaman reddedilmez.
+  keepalive:
+    if: github.event.schedule == '13 3 * * *'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Zamanlamayı canlı tut
+        run: gh api -X PUT "repos/$GITHUB_REPOSITORY/actions/workflows/sinyal.yml/enable"
+        env:
+          GH_TOKEN: ${{ github.token }}
