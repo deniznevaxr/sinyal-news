@@ -23,13 +23,15 @@ SİNYAL bir web uygulamasıdır: bir kez yükleyince masaüstünde ve Başlat me
 
 Arkadaşına da yalnızca bu adresi göndermen yeterli.
 
-### Windows kurulum dosyası (.exe)
+### Windows uygulaması (.exe)
 
-Link yerine dosya göndermek istersen: **`SINYAL-Kurulum-1.0.0.exe`**. Çift tıklayınca birkaç saniyede kurulur, masaüstüne ve Başlat menüsüne **SİNYAL** simgesini ekler ve uygulamayı açar. Yönetici izni istemez; kaldırmak için **Ayarlar → Uygulamalar → SİNYAL → Kaldır**.
+**İndir:** https://github.com/deniznevaxr/sinyal-news/releases/latest/download/SINYAL-Kurulum.exe (~98 MB). Bu link her zaman en son sürümü indirir; arkadaşına dosya yerine bunu da gönderebilirsin.
+
+Çift tıklayınca birkaç saniyede kurulur, masaüstüne ve Başlat menüsüne **SİNYAL** simgesini ekler ve uygulamayı açar. Yönetici izni istemez; kaldırmak için **Ayarlar → Uygulamalar → SİNYAL → Kaldır**.
 
 - Uygulama, yukarıdaki internet sürümünü kendi penceresinde açar. Haberler ve arayüz güncellemeleri internetten gelir; .exe'yi yeniden göndermen gerekmez.
 - Dosya dijital olarak imzalı olmadığı için Windows ilk açılışta “Windows bilgisayarınızı korudu” diyebilir: **Ek bilgi → Yine de çalıştır**. Tarayıcı indirirken uyarırsa **Sakla**'yı seç.
-- Dosyayı yeniden üretmek için `desktop` klasöründe `npm install`, ardından `npm run dist` → `desktop/dist/SINYAL-Kurulum-1.0.0.exe`.
+- Dosyayı yeniden üretmek için `desktop` klasöründe `npm install`, ardından `npm run dist` → `desktop/dist/SINYAL-Kurulum-<sürüm>.exe`. Yeni sürümü yayınlarken GitHub'da **Releases → Draft a new release** ile **SINYAL-Kurulum.exe** adıyla yükle; yukarıdaki link bu ad sayesinde hep en son sürümü gösterir.
 
 ## 1. Kendi bilgisayarında çalıştır
 
