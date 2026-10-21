@@ -1,0 +1,194 @@
+{
+  "_info": "SİNYAL kaynak listesi. Yeni RSS eklemek için 'news' dizisine {id, name, short, url, domain} ekleyin. domain: audio (ses) | music (müzik) | visual (görsel). 'topics' içerik bir konuya uymazsa kullanılacak yedek konudur. 'filter: true' genel teknoloji sitelerinden yalnızca ses/müzik/görsel ile ilgili yazıları alır. 'every' dakika cinsinden yenileme aralığıdır.",
+
+  "defaults": { "newsEvery": 10, "maxPerFeed": 40 },
+
+  "news": [
+    { "id": "cdm",          "name": "CDM — Create Digital Music", "short": "CDM",  "url": "https://cdm.link/feed/",                          "domain": "music", "topics": ["production"], "weight": 1.1 },
+    { "id": "synthtopia",   "name": "Synthtopia",                 "short": "SYNT", "url": "https://www.synthtopia.com/feed/",                "domain": "music", "topics": ["instruments"] },
+    { "id": "gearnews",     "name": "Gearnews",                   "short": "GEAR", "url": "https://www.gearnews.com/feed/",                  "domain": "music", "topics": ["instruments"] },
+    { "id": "musicradar",   "name": "MusicRadar",                 "short": "MRDR", "url": "https://www.musicradar.com/feeds.xml",            "domain": "music", "topics": ["instruments"], "weight": 0.95, "max": 30 },
+    { "id": "musictech",    "name": "MusicTech",                  "short": "MTEC", "url": "https://musictech.com/feed/",                     "domain": "music", "topics": ["production"] },
+    { "id": "attack",       "name": "Attack Magazine",            "short": "ATCK", "url": "https://www.attackmagazine.com/feed/",            "domain": "music", "topics": ["production"], "weight": 0.95 },
+    { "id": "sos",          "name": "Sound On Sound",             "short": "SOS",  "url": "https://www.soundonsound.com/rss.xml",            "domain": "music", "topics": ["production"], "weight": 1.05 },
+    { "id": "rekkerd",      "name": "Rekkerd",                    "short": "RKKD", "url": "https://rekkerd.org/feed/",                       "domain": "music", "topics": ["production"], "weight": 0.9 },
+    { "id": "bpb",          "name": "Bedroom Producers Blog",     "short": "BPB",  "url": "https://bedroomproducersblog.com/feed/",          "domain": "music", "topics": ["production"] },
+    { "id": "splice",       "name": "Splice Blog",                "short": "SPLC", "url": "https://splice.com/blog/feed/",                   "domain": "music", "topics": ["production"], "weight": 0.8 },
+    { "id": "ableton",      "name": "Ableton Blog",               "short": "ABLT", "url": "https://www.ableton.com/en/blog/feeds/latest/",   "domain": "music", "topics": ["production"], "weight": 0.9, "every": 30 },
+    { "id": "waveinformer", "name": "WaveInformer",               "short": "WINF", "url": "https://www.waveinformer.com/feed/",              "domain": "music", "topics": ["production"], "weight": 0.85 },
+    { "id": "mixmagtr",     "name": "Mixmag Türkiye",             "short": "MXTR", "url": "https://mixmag.com.tr/rss.xml",                   "domain": "music", "flags": ["tr"], "weight": 0.85, "every": 30 },
+    { "id": "apd",          "name": "Audio Plugin Deals",         "short": "APD",  "url": "https://audioplugin.deals/feed/",                 "domain": "music", "topics": ["production"], "flags": ["deal"], "weight": 0.85 },
+    { "id": "apg",          "name": "Audio Plugin Guy",           "short": "APG",  "url": "https://www.audiopluginguy.com/feed/",            "domain": "music", "topics": ["production"], "flags": ["deal"], "weight": 0.85 },
+    { "id": "mbw",          "name": "Music Business Worldwide",   "short": "MBW",  "url": "https://www.musicbusinessworldwide.com/feed/",    "domain": "music", "topics": ["industry"] },
+    { "id": "musically",    "name": "Music Ally",                 "short": "MALY", "url": "https://musically.com/feed/",                     "domain": "music", "topics": ["industry"] },
+    { "id": "dmn",          "name": "Digital Music News",         "short": "DMN",  "url": "https://www.digitalmusicnews.com/feed/",          "domain": "music", "topics": ["industry"], "weight": 0.9, "max": 30 },
+
+    { "id": "elevenlabs",   "name": "ElevenLabs Blog",            "short": "11LB", "url": "https://elevenlabs.io/blog/rss.xml",              "domain": "audio", "topics": ["voice"], "weight": 1.1, "every": 30 },
+    { "id": "izotope",      "name": "iZotope Blog",               "short": "IZTP", "url": "https://www.izotope.com/community/blog/feed",     "domain": "audio", "topics": ["audiotech"], "weight": 0.85, "every": 30 },
+    { "id": "mixonline",    "name": "Mix Online",                 "short": "MIX",  "url": "https://www.mixonline.com/feed",                  "domain": "audio", "topics": ["audiotech"], "weight": 0.9 },
+    { "id": "ami",          "name": "Audio Media International",  "short": "AMI",  "url": "https://audiomediainternational.com/feed/",       "domain": "audio", "topics": ["audiotech"], "weight": 0.85 },
+    { "id": "audioxpress",  "name": "audioXpress",                "short": "AXP",  "url": "https://www.audioxpress.com/rss",                 "domain": "audio", "topics": ["audiogear"], "weight": 0.85, "max": 25 },
+    { "id": "sonicscoop",   "name": "SonicScoop",                 "short": "SSCP", "url": "https://www.sonicscoop.com/feed/",                "domain": "audio", "topics": ["audiotech"], "weight": 0.8 },
+    { "id": "soundguys",    "name": "SoundGuys",                  "short": "SGUY", "url": "https://www.soundguys.com/feed/",                 "domain": "audio", "topics": ["audiogear"], "flags": ["consumer"], "weight": 0.7, "max": 20 },
+    { "id": "whathifi",     "name": "What Hi-Fi?",                "short": "WHF",  "url": "https://www.whathifi.com/feeds.xml",              "domain": "audio", "topics": ["audiogear"], "flags": ["consumer"], "weight": 0.7, "max": 20 },
+    { "id": "headphonesty", "name": "Headphonesty",               "short": "HPST", "url": "https://www.headphonesty.com/feed/",              "domain": "audio", "topics": ["audiogear"], "flags": ["consumer"], "weight": 0.65, "max": 20 },
+
+    { "id": "cgchannel",    "name": "CG Channel",                 "short": "CGCH", "url": "https://www.cgchannel.com/feed/",                 "domain": "visual", "topics": ["3d"], "weight": 1.0 },
+    { "id": "80lv",         "name": "80 Level",                   "short": "80LV", "url": "https://80.lv/feed/",                             "domain": "visual", "topics": ["3d"], "weight": 0.9 },
+    { "id": "blendernation","name": "BlenderNation",              "short": "BLNT", "url": "https://www.blendernation.com/feed/",             "domain": "visual", "topics": ["3d"], "weight": 0.9 },
+    { "id": "blenderorg",   "name": "Blender",                    "short": "BLND", "url": "https://www.blender.org/feed/",                   "domain": "visual", "topics": ["3d"], "weight": 1.0, "every": 60 },
+    { "id": "beforesafters","name": "befores & afters",           "short": "B&A",  "url": "https://beforesandafters.com/feed/",              "domain": "visual", "topics": ["3d"], "weight": 0.9 },
+    { "id": "fxguide",      "name": "fxguide",                    "short": "FXG",  "url": "https://www.fxguide.com/feed/",                   "domain": "visual", "topics": ["3d"], "weight": 0.95, "every": 60 },
+    { "id": "creativebloq", "name": "Creative Bloq",              "short": "CBLQ", "url": "https://www.creativebloq.com/feeds.xml",          "domain": "visual", "topics": ["design"], "weight": 0.9, "max": 25 },
+    { "id": "motionographer","name": "Motionographer",            "short": "MOGR", "url": "https://motionographer.com/feed/",                "domain": "visual", "topics": ["design"], "weight": 0.85 },
+    { "id": "provideo",     "name": "ProVideo Coalition",         "short": "PVC",  "url": "https://www.provideocoalition.com/feed/",         "domain": "visual", "topics": ["design"], "weight": 0.9 },
+    { "id": "nofilmschool", "name": "No Film School",             "short": "NFS",  "url": "https://nofilmschool.com/rss.xml",                "domain": "visual", "topics": ["design"], "weight": 0.85, "max": 20, "filter": true },
+    { "id": "petapixel",    "name": "PetaPixel",                  "short": "PETA", "url": "https://petapixel.com/feed/",                     "domain": "visual", "topics": ["design"], "weight": 0.75, "max": 15 },
+    { "id": "comfyblog",    "name": "ComfyUI Blog",               "short": "COMF", "url": "https://blog.comfy.org/feed",                     "domain": "visual", "topics": ["imageai"], "weight": 1.0, "every": 60 },
+
+    { "id": "verge",        "name": "The Verge",                  "short": "VRGE", "url": "https://www.theverge.com/rss/index.xml",          "filter": true, "weight": 0.95 },
+    { "id": "vergeai",      "name": "The Verge · AI",             "short": "VRGE", "url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml", "filter": true, "weight": 0.95 },
+    { "id": "techcrunch",   "name": "TechCrunch",                 "short": "TCR",  "url": "https://techcrunch.com/feed/",                    "filter": true },
+    { "id": "engadget",     "name": "Engadget",                   "short": "ENGT", "url": "https://www.engadget.com/rss.xml",                "filter": true, "weight": 0.85 },
+    { "id": "arsai",        "name": "Ars Technica · AI",          "short": "ARS",  "url": "https://arstechnica.com/ai/feed/",                "filter": true, "weight": 0.95 },
+    { "id": "decoder",      "name": "The Decoder",                "short": "DCDR", "url": "https://the-decoder.com/feed/",                   "filter": true },
+    { "id": "marktechpost", "name": "MarkTechPost",               "short": "MTP",  "url": "https://www.marktechpost.com/feed/",              "filter": true, "weight": 0.9 },
+    { "id": "hfblog",       "name": "Hugging Face Blog",          "short": "HFB",  "url": "https://huggingface.co/blog/feed.xml",            "filter": true, "weight": 1.1, "max": 40, "every": 30 },
+    { "id": "openai",       "name": "OpenAI News",                "short": "OAI",  "url": "https://openai.com/news/rss.xml",                 "filter": true, "weight": 1.15, "max": 40, "every": 30 },
+    { "id": "deepmind",     "name": "Google DeepMind",            "short": "GDM",  "url": "https://deepmind.google/blog/rss.xml",            "filter": true, "weight": 1.15, "max": 40, "every": 30 },
+    { "id": "gresearch",    "name": "Google Research",            "short": "GRES", "url": "https://research.google/blog/rss/",               "filter": true, "tags": ["research"], "max": 40, "every": 30 },
+    { "id": "stability",    "name": "Stability AI",               "short": "STAB", "url": "https://stability.ai/news-updates?format=rss",    "filter": true, "every": 60 }
+  ],
+
+  "hackernews": {
+    "every": 15,
+    "minPoints": 5,
+    "windowDays": 4,
+    "queries": ["audio", "music", "synth", "synthesizer", "speech", "TTS", "text-to-speech", "voice AI", "DSP", "MIDI", "Spotify", "podcast", "headphones", "Suno", "ElevenLabs", "Ableton",
+                "image generation", "video generation", "Midjourney", "Stable Diffusion", "Blender", "Sora", "Photoshop", "Figma"]
+  },
+
+  "reddit": {
+    "every": 40,
+    "gapSeconds": 35,
+    "groups": [
+      { "name": "Prodüksiyon", "subs": [
+        { "name": "audioengineering",     "short": "r/ae",    "domain": "audio", "topics": ["audiotech"] },
+        { "name": "WeAreTheMusicMakers",  "short": "r/watmm", "domain": "music", "topics": ["production"] },
+        { "name": "musicproduction",      "short": "r/mprod", "domain": "music", "topics": ["production"] },
+        { "name": "edmproduction",        "short": "r/edm",   "domain": "music", "topics": ["production"] },
+        { "name": "AudioPost",            "short": "r/post",  "domain": "audio", "topics": ["audiotech"] }
+      ] },
+      { "name": "Donanım ve DAW", "subs": [
+        { "name": "synthesizers",         "short": "r/synth", "domain": "music", "topics": ["instruments"] },
+        { "name": "modular",              "short": "r/mod",   "domain": "music", "topics": ["instruments"] },
+        { "name": "ableton",              "short": "r/abl",   "domain": "music", "topics": ["production"] },
+        { "name": "AudioProductionDeals", "short": "r/deals", "domain": "music", "topics": ["production"], "flags": ["deal"] }
+      ] },
+      { "name": "Yapay zekâ ses ve müzik", "subs": [
+        { "name": "SunoAI",               "short": "r/suno",  "domain": "music", "topics": ["musicai"] },
+        { "name": "udiomusic",            "short": "r/udio",  "domain": "music", "topics": ["musicai"] },
+        { "name": "LocalLLaMA",           "short": "r/llama", "filter": true },
+        { "name": "MachineLearning",      "short": "r/ml",    "filter": true }
+      ] },
+      { "name": "Görsel", "subs": [
+        { "name": "StableDiffusion",      "short": "r/sd",    "domain": "visual", "topics": ["imageai"] },
+        { "name": "comfyui",              "short": "r/comfy", "domain": "visual", "topics": ["imageai"] },
+        { "name": "aivideo",              "short": "r/aivid", "domain": "visual", "topics": ["videoai"] },
+        { "name": "midjourney",           "short": "r/mj",    "domain": "visual", "topics": ["imageai"] },
+        { "name": "blender",              "short": "r/blend", "domain": "visual", "topics": ["3d"] }
+      ] }
+    ]
+  },
+
+  "youtube": {
+    "every": 30,
+    "channels": [
+      { "id": "UCdcemy56JtVTrsFIOoqvV8g", "name": "Andrew Huang",        "domain": "music",  "topics": ["production"] },
+      { "id": "UCzsd4-oyHhNbAXfceOQ5HTw", "name": "Venus Theory",        "domain": "music",  "topics": ["production"] },
+      { "id": "UC-RA5BzE_BnZhf5iVdNF1hA", "name": "loopop",              "domain": "music",  "topics": ["instruments"] },
+      { "id": "UCW64y2tidRL5njv0JrQdvbA", "name": "Sonic State",         "domain": "music",  "topics": ["instruments"] },
+      { "id": "UCvqGJkKHb-VHgxJmuBbIfIQ", "name": "Starsky Carr",        "domain": "music",  "topics": ["instruments"] },
+      { "id": "UCdhsQHBXLpf-qrAVox4fyMA", "name": "Synth Anatomy",       "domain": "music",  "topics": ["instruments"] },
+      { "id": "UCJP2E6KQ48y9dpQGg9_z8fA", "name": "Perfect Circuit",     "domain": "music",  "topics": ["instruments"] },
+      { "id": "UCzGKvvhu_QAnLCO5oWAfMxg", "name": "Gearnews",            "domain": "music",  "topics": ["instruments"] },
+      { "id": "UCIcCXe3iWo6lq-iWKV40Oug", "name": "In The Mix",          "domain": "music",  "topics": ["production"] },
+      { "id": "UCpyUGZeMUtOvt57UACw3H2g", "name": "Produce Like A Pro",  "domain": "audio",  "topics": ["audiotech"] },
+      { "id": "UCHzcS9Hm5dieyRWDMY-earw", "name": "Busy Works Beats",    "domain": "music",  "topics": ["production"] },
+      { "id": "UCQnz5mUTDkGwKvIQ9uyqiXw", "name": "Dan Worrall",         "domain": "audio",  "topics": ["audiotech"] },
+      { "id": "UCFgUBKoy5trmcyVh1e_AS8Q", "name": "White Sea Studio",    "domain": "music",  "topics": ["production"] },
+      { "id": "UChnxLLvzviaR5NeKOevB8iQ", "name": "Red Means Recording", "domain": "music",  "topics": ["instruments"] },
+      { "id": "UCXbivlvSlSWfTHLqq1b_E1w", "name": "Sam Smyers",          "domain": "music",  "topics": ["production"] },
+      { "id": "UCGn9KdqacVzcc7-N7Oznc3w", "name": "Audio Plugin Deals",  "domain": "music",  "topics": ["production"], "flags": ["deal"] },
+      { "id": "UCgWZYUZjiidjWgfs95pJrWg", "name": "Ableton",             "domain": "music",  "topics": ["production"] },
+      { "id": "UCwjiBFz7LuxYvmIRw5kChFA", "name": "Native Instruments",  "domain": "music",  "topics": ["production"] },
+      { "id": "UC1kdsZUTDSW1BtsHEoYx4WQ", "name": "Sweetwater",          "domain": "music",  "topics": ["instruments"] },
+      { "id": "UC9Ryt3XOGYBoAJVsBHNGDzA", "name": "Theoretically Media", "domain": "visual", "topics": ["videoai"] },
+      { "id": "UC5Wz4fFacYuON6IKbhSa7Zw", "name": "MattVidPro AI",       "domain": "visual", "topics": ["videoai"] },
+      { "id": "UCOKHwx1VCdgnxwbjyb9Iu1g", "name": "Blender Guru",        "domain": "visual", "topics": ["3d"] },
+      { "id": "UCSpFnDQr88xCZ80N-X7t0nQ", "name": "Corridor Crew",       "domain": "visual", "topics": ["3d"] },
+      { "id": "UCmMbwA-s3GZDKVzGZ-kPwaQ", "name": "pixaroma",            "domain": "visual", "topics": ["imageai"] },
+      { "id": "UC4-5v-f-xKnbi1yaAuRSi_w", "name": "Nerdy Rodent",        "domain": "visual", "topics": ["imageai"] },
+      { "id": "UCvKqTb-65iAmXK59sFNKINQ", "name": "Sebastian Kamph",     "domain": "visual", "topics": ["imageai"] },
+      { "id": "UCIgnGlGkVRhd4qNFcEwLL4A", "name": "AI Search",           "filter": true },
+      { "id": "UChpleBmo18P08aKCIgti38g", "name": "Matt Wolfe",          "filter": true },
+      { "id": "UCbfYPyITQ-7l4upoX8nvctg", "name": "Two Minute Papers",   "filter": true, "tags": ["research"] }
+    ]
+  },
+
+  "github": {
+    "searchEvery": 60,
+    "trendingEvery": 45,
+    "releasesEvery": 90,
+    "topics": ["audio", "music", "text-to-speech", "tts", "speech-recognition", "speech-synthesis", "music-generation", "voice-cloning", "audio-processing", "dsp", "synthesizer", "vst", "midi", "audio-plugin", "voice-conversion", "music-information-retrieval",
+               "text-to-image", "text-to-video", "image-generation", "video-generation", "comfyui", "stable-diffusion", "gaussian-splatting", "blender"],
+    "monthlyTopics": ["audio", "music", "text-to-speech", "speech-recognition", "text-to-video", "image-generation", "comfyui"],
+    "keywordQueries": [
+      "audio OR music OR tts OR synthesizer OR vst in:name,description",
+      "speech OR voice OR midi OR dsp OR daw in:name,description",
+      "comfyui OR diffusion OR text-to-video OR video-generation OR text-to-image in:name,description"
+    ],
+    "trendingLanguages": ["", "python", "c++", "rust", "typescript", "javascript", "swift", "c"],
+    "releases": [
+      "audacity/audacity", "LMMS/lmms", "musescore/MuseScore", "mixxxdj/mixxx", "surge-synthesizer/surge", "VCVRack/Rack",
+      "supercollider/supercollider", "sonic-pi-net/sonic-pi", "Tonejs/Tone.js", "juce-framework/JUCE", "grame-cncm/faust",
+      "csound/csound", "ccrma/chuck", "pure-data/pure-data", "BespokeSynth/BespokeSynth", "asb2m10/dexed", "DISTRHO/Cardinal",
+      "falkTX/Carla", "tenacityteam/tenacity", "FluidSynth/fluidsynth", "free-audio/clap", "spotify/pedalboard", "librosa/librosa",
+      "beetbox/beets", "hydrogen-music/hydrogen", "ossia/score", "plugdata-team/plugdata", "zrythm/zrythm", "sonosaurus/sonobus",
+      "TheWaveWarden/odin2", "TidalCycles/Tidal",
+      "ggml-org/whisper.cpp", "openai/whisper", "SYSTRAN/faster-whisper", "m-bain/whisperX", "SWivid/F5-TTS",
+      "resemble-ai/chatterbox", "FunAudioLLM/CosyVoice", "fishaudio/fish-speech", "RVC-Project/Retrieval-based-Voice-Conversion-WebUI",
+      "k2-fsa/sherpa-onnx", "NVIDIA/NeMo", "pyannote/pyannote-audio", "multimodal-art-projection/YuE", "2noise/ChatTTS",
+      "index-tts/index-tts", "kyutai-labs/moshi", "nomadkaraoke/python-audio-separator", "Anjok07/ultimatevocalremovergui",
+      "ZFTurbo/Music-Source-Separation-Training", "OHF-Voice/piper1-gpl", "idiap/coqui-ai-TTS", "OpenBMB/VoxCPM",
+      "magenta/magenta-realtime", "ace-step/ACE-Step-1.5",
+      "Comfy-Org/ComfyUI", "Comfy-Org/ComfyUI-Manager", "invoke-ai/InvokeAI", "huggingface/diffusers", "mcmonkeyprojects/SwarmUI",
+      "Acly/krita-ai-diffusion", "bmaltais/kohya_ss", "chaiNNer-org/chaiNNer", "blender/blender", "obsproject/obs-studio",
+      "mltframework/shotcut", "darktable-org/darktable"
+    ]
+  },
+
+  "huggingface": {
+    "every": 45,
+    "tasks": [
+      { "tag": "text-to-speech",               "domain": "audio",  "topic": "voice" },
+      { "tag": "automatic-speech-recognition", "domain": "audio",  "topic": "voice" },
+      { "tag": "audio-to-audio",               "domain": "audio",  "topic": "audiotech" },
+      { "tag": "audio-text-to-text",           "domain": "audio",  "topic": "voice" },
+      { "tag": "audio-classification",         "domain": "audio",  "topic": "audiotech" },
+      { "tag": "text-to-audio",                "domain": "music",  "topic": "musicai" },
+      { "tag": "text-to-image",                "domain": "visual", "topic": "imageai" },
+      { "tag": "image-to-image",               "domain": "visual", "topic": "imageai" },
+      { "tag": "text-to-video",                "domain": "visual", "topic": "videoai" },
+      { "tag": "image-to-video",               "domain": "visual", "topic": "videoai" },
+      { "tag": "image-to-3d",                  "domain": "visual", "topic": "3d" }
+    ],
+    "spaceQueries": ["tts", "music", "audio", "voice", "speech", "song", "video", "image", "flux", "3d"]
+  },
+
+  "arxiv": [
+    { "id": "arxiv",    "name": "arXiv · Ses ve konuşma",  "every": 60, "domain": "audio", "query": "cat:cs.SD OR cat:eess.AS", "max": 80 },
+    { "id": "arxiv-cv", "name": "arXiv · Görsel üretim",   "every": 60, "domain": "visual", "max": 50,
+      "query": "cat:cs.CV AND (ti:\"video generation\" OR ti:\"text-to-video\" OR ti:\"image generation\" OR ti:\"text-to-image\" OR ti:\"image editing\" OR ti:\"video editing\" OR ti:\"3D generation\")" }
+  ]
+}

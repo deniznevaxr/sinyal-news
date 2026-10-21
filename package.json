@@ -1,0 +1,17 @@
+{
+  "name": "sinyal",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SİNYAL — ses ve müzik teknolojileri için gerçek zamanlı istihbarat paneli",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18.17"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.132.1"
+  }
+}

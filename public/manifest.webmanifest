@@ -1,0 +1,10 @@
+{
+  "name": "SİNYAL — Ses, Müzik ve Görsel Teknoloji Haberleri",
+  "short_name": "SİNYAL",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0c0d10",
+  "theme_color": "#0c0d10",
+  "icons": [{ "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}
