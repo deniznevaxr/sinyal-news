@@ -27,7 +27,10 @@ const HOST = process.env.HOST || (PUBLIC ? '0.0.0.0' : '127.0.0.1');
 const PORT = Number(process.env.PORT) || 4400; // A4 = 440 Hz
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN || '';
 const BRIEF_AUTO_HOURS = Number(process.env.BRIEF_AUTO_HOURS || (PUBLIC ? 12 : 0));
-const VERSION = JSON.parse(readFileSync(path.join(ROOT, 'package.json'), 'utf8')).version;
+const PKG = JSON.parse(readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
+const VERSION = PKG.version;
+// The published copy (GitHub Pages): this computer reuses its Turkish translations.
+const SITE_URL = process.env.SINYAL_SITE_URL ?? PKG.homepage ?? '';
 
 const sources = JSON.parse(readFileSync(path.join(ROOT, 'config', 'sources.json'), 'utf8'));
 const store = new Store(DATA);
@@ -59,6 +62,12 @@ let translateTimer = null;
 function translateSoon() {
   clearTimeout(translateTimer);
   translateTimer = setTimeout(async () => {
+    // First what the published copy has already translated, then Google for the rest.
+    if (!PUBLIC) {
+      const got = await translator.borrow(SITE_URL);
+      if (Object.keys(got.items).length) broadcast('tr', got.items);
+      if (got.about.length) broadcast('about', slimAbout(got.about));
+    }
     await translator.run({
       max: 150,
       first: analysis.clusters.flatMap(c => c.ids), // featured stories before the rest

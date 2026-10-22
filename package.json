@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "SİNYAL — ses ve müzik teknolojileri için gerçek zamanlı istihbarat paneli",
+  "homepage": "https://deniznevaxr.github.io/sinyal-news/",
   "type": "module",
   "main": "server.js",
   "scripts": {

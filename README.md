@@ -100,7 +100,10 @@ Sağ üstteki **TR / EN** düğmesi arayüzü ve haberleri değiştirir:
 - **TR:** başlıklar ve özetler otomatik çeviriyle Türkçe gösterilir. Bir haberi açınca **“Orijinalini göster”** ile İngilizcesine dönebilirsin.
 - **EN:** her şey orijinal dilinde.
 
-Çeviri sunucuda Google'ın ücretsiz çeviri servisiyle yapılır ve saklanır; o servis yoğunluktan dolayı bir süre yanıt vermezse Chrome tarayıcısının kendi cihaz içi çevirmeni devreye girer (**“Bu cihazda çevir”**). Çeviriler otomatiktir; ürün adlarında ara sıra tuhaflıklar olabilir.
+Çeviri, GitHub'daki güncellemede Google'ın ücretsiz çeviri servisiyle yapılır ve saklanır. Çeviriler otomatiktir; ürün adlarında ara sıra tuhaflıklar olabilir.
+
+- **Bilgisayardaki sürüm (BASLAT.bat)** çevirileri önce yayındaki siteden alır. Google'a yalnızca sitede henüz olmayan yeni haberler için gider. Bazı ağlar Google'a giden bağlantıları bozabiliyor, Google da bir internet adresine geçici sınır koyabiliyor; bu sayede iki durumda da Türkçe gelmeye devam eder.
+- Google bir süre yanıt vermezse Chrome tarayıcısının kendi cihaz içi çevirmeni devreye girer (**“Bu cihazda çevir”**).
 
 ### Klavye
 
@@ -129,7 +132,7 @@ Sağ üstteki **TR / EN** düğmesi arayüzü ve haberleri değiştirir:
 | Belirti | Çözüm |
 |---|---|
 | Bir kaynak çalışmıyor | Ayarlar → Kaynaklar listesinde hata yazar; geçici hatalar birkaç dakika içinde kendiliğinden yeniden denenir. |
-| Bazı başlıklar İngilizce kaldı | Çeviri birkaç dakika içinde tamamlanır; acelen varsa “Bu cihazda çevir” (Chrome). |
+| Bazı başlıklar İngilizce kaldı | Çok yeni haberler bir sonraki site güncellemesinde (~20 dk) Türkçeleşir; acelen varsa “Bu cihazda çevir” (Chrome). |
 | Reddit “HTTP 429” | Reddit oturumsuz isteklere sıkı sınır koyuyor; bir sonraki turda düzelir. |
 | Port meşgul | Sunucu otomatik olarak 4401, 4402… dener; konsolda gerçek adres yazar. |
 
