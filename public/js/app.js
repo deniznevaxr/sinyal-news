@@ -5,12 +5,12 @@ import { $, $$, esc, debounce, storage, copyText, safeUrl, HOUR, DAY } from './u
 import { t, lang, setLang } from './i18n.js';
 import { ago, agoLong } from './fmt.js';
 import { S, SECTIONS, persist, setItems, addItems, applyTranslations, setAnalysis, compileWatch, watchHits, getItem, visible, needsTranslation, titleOf } from './model.js';
-import { toast } from './ui.js';
+import { toast, icon } from './ui.js';
 import { renderChrome, renderSections, renderStatus, renderSavedBadge, renderDomains } from './chrome.js';
 import { renderMain, refreshNewsList, showMore, boardItem } from './views.js';
 import {
   openDrawer, refreshDrawer, closeDrawer, openPalette, paletteOpen, paletteKey, paletteClick, openModal, closeModal, modalOpen, settingsBody, keysBody,
-  openSheet, closeSheet, sheetOpen, moreBody, layers, anyLayerOpen, closeTopLayer,
+  openSheet, closeSheet, sheetOpen, moreBody, layers, anyLayerOpen, closeTopLayer, canQuit,
 } from './overlays.js';
 import { generateBrief, copyBrief, refreshBrief, toggleBrief } from './brief.js';
 import { probeDeviceTranslator, deviceTranslatorState, translateOnDevice } from './translate.js';
@@ -43,6 +43,7 @@ const getJSON = async url => {
 function applyState(state) {
   setItems(state.items || []);
   S.boards = state.boards || {};
+  S.about = state.about || {};
   S.transient.clear();
   setAnalysis(state.analysis);
   S.sources = state.sources || [];
@@ -73,8 +74,30 @@ async function loadAll() {
 function renderAll({ keepScroll = false } = {}) {
   renderChrome();
   renderInstall();
+  $('#quit-btn').hidden = !canQuit();
+  $('#quit-btn').setAttribute('aria-label', t('quit.button'));
+  $('#quit-btn').title = t('quit.button');
   renderMain({ keepScroll });
   autoTranslate();
+}
+
+// ------------------------------------------------------------------ quitting (local version)
+// "Kapat" stops the local server too, so nothing keeps scanning in the background.
+function showClosed() {
+  quit = true;
+  es?.close();
+  closeTopLayer();
+  if ($('.closed-screen')) return;
+  document.body.insertAdjacentHTML('beforeend', `<div class="closed-screen" role="status"><div>
+    ${$('.brand-mark').outerHTML}<h1>${esc(t('quit.done'))}</h1><p>${esc(t('quit.doneText'))}</p>
+    <button class="btn" type="button" onclick="window.close()">${esc(t('quit.close'))}</button></div></div>`);
+  setTimeout(() => window.close(), 1500); // app windows may close themselves; tabs ignore it
+}
+
+async function quitApp() {
+  closeModal();
+  try { await post('api/shutdown'); } catch { /* already gone */ }
+  showClosed();
 }
 
 // ------------------------------------------------------------------ installable app (PWA)
@@ -111,7 +134,9 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || ['localho
 
 // ------------------------------------------------------------------ live mode (SSE)
 let es = null;
+let quit = false; // after "Kapat": never reconnect to the stopped server
 function connect() {
+  if (quit) return;
   es?.close();
   es = new EventSource('api/stream');
   es.addEventListener('hello', async e => {
@@ -141,12 +166,14 @@ function connect() {
     S.transient.clear();
     viewSoon(['home', 'tools']);
   });
+  es.addEventListener('about', e => { Object.assign(S.about, JSON.parse(e.data)); S.transient.clear(); viewSoon(['home', 'tools']); refreshDrawer(); });
   es.addEventListener('analysis', e => { setAnalysis(JSON.parse(e.data)); viewSoon(['home']); });
   es.addEventListener('tr', e => {
     applyTranslations(JSON.parse(e.data));
     if (lang === 'tr') { viewSoon([S.section]); refreshDrawer(); }
   });
   es.addEventListener('brief', e => { S.brief = JSON.parse(e.data); refreshBrief(); });
+  es.addEventListener('bye', () => showClosed());
   es.addEventListener('meta', e => {
     const m = JSON.parse(e.data);
     if (m.flags) S.settings = { ...(S.settings || {}), ...m.flags };
@@ -486,6 +513,13 @@ const ACTIONS = {
     setSection(el.dataset.v);
   },
   'more-sheet': () => { if (!closeSheet()) openSheet(moreBody()); },
+  quit: () => {
+    closeSheet();
+    openModal(t('quit.title'), `<p style="margin:14px 0 20px;color:var(--text-2);font-size:15px;line-height:1.55">${esc(t('quit.text'))}</p>
+      <div class="set-flex" style="justify-content:flex-end"><button class="btn ghost" type="button" data-action="close-modal">${esc(t('settings.cancel'))}</button>
+      <button class="btn primary" type="button" data-action="quit-confirm">${icon('power')}${esc(t('quit.confirm'))}</button></div>`);
+  },
+  'quit-confirm': () => quitApp(),
   share: el => shareItem(el.dataset.id),
   'install-dismiss': () => { storage.set('installHidden', true); renderMain({ keepScroll: true }); },
   topic: el => { S.topic = el.dataset.v || null; persist('topic'); renderMain({ keepScroll: true }); autoTranslate(); },

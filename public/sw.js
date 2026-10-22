@@ -1,11 +1,11 @@
 // Service worker: makes SİNYAL installable as an app and keeps the last news readable offline.
 // Strategy is network-first, so a new deploy or a fresh data.json always wins when online.
-const CACHE = 'sinyal-v3';
+const CACHE = 'sinyal-v4';
 const SHELL = [
   './', 'index.html', 'manifest.webmanifest', 'favicon.svg', 'css/app.css',
   'icons/icon-192.png', 'icons/icon-512.png',
   'js/app.js', 'js/brief.js', 'js/chrome.js', 'js/fmt.js', 'js/i18n.js', 'js/mobile.js', 'js/model.js', 'js/overlays.js',
-  'js/text.js', 'js/translate.js', 'js/ui.js', 'js/util.js', 'js/views.js',
+  'js/glossary.js', 'js/text.js', 'js/translate.js', 'js/ui.js', 'js/util.js', 'js/views.js',
 ];
 
 self.addEventListener('install', event => {

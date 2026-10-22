@@ -47,10 +47,18 @@ Telefonda SİNYAL bir telefon uygulaması gibi çalışır:
 ## 1. Kendi bilgisayarında çalıştır
 
 1. **`BASLAT.bat`** dosyasına çift tıkla (Node.js 18.17+ gerekir; bu bilgisayarda kurulu).
-2. SİNYAL ayrı bir uygulama penceresinde açılır. İlk tarama birkaç dakika sürer; haberler geldikçe ekran dolar.
-3. Konsol penceresi açık kaldıkça tarama sürer. Kapatınca durur; veriler `data/` klasöründe kalır.
+2. SİNYAL ayrı bir uygulama penceresinde açılır. Tarama, görev çubuğunda küçültülmüş bir pencerede çalışır. İlk tarama birkaç dakika sürer; haberler geldikçe ekran dolar.
+3. **Kapatmak için** sağ üstteki **⏻ Kapat** düğmesine bas ya da uygulama penceresini kapat. Pencereyi kapatırsan yarım dakika içinde tarama da kendiliğinden durur; arka planda hiçbir şey çalışmaz. Veriler `data/` klasöründe kalır.
 
 Yerel sürümün farkı: haberler 20 dakika beklemeden, düştüğü an gelir ve yapay zekâ özetini istediğin an oluşturabilirsin.
+
+### Bilgisayarım kapalıyken ne olur, bir şey harcar mı?
+
+- **İnternetteki site ve telefondaki uygulama** GitHub'ın sunucularında çalışır. Senin bilgisayarın kapalıyken de link açılır ve haberler yaklaşık 20 dakikada bir güncellenir.
+- **Ücret ya da token yok.** GitHub herkese açık projeler için bu hizmeti ücretsiz veriyor, çeviri de ücretsiz bir servisle yapılıyor.
+- Claude (Anthropic) API anahtarı eklenmediği sürece hiçbir token harcanmaz. Anahtar yalnızca isteğe bağlı "yapay zekâ özeti" için gerekir.
+- **Windows uygulaması (.exe) ve telefona yüklenen uygulama** kapatınca tamamen kapanır; arka planda bir şey bırakmaz.
+- **GitHub'daki otomatik güncellemeyi** de durdurmak istersen repoda **Actions** → *SİNYAL — güncelle ve yayınla* → **⋯ → Disable workflow**. Bu durumda site son haliyle kalır.
 
 ## 2. İnternette yayınla (arkadaşın linkten açsın)
 
@@ -78,6 +86,10 @@ Notlar:
   - **Görsel:** Yapay zekâ görsel (Midjourney, Flux, Stable Diffusion…) · Yapay zekâ video (Sora, Veo, Kling…) · Tasarım & kurgu (Adobe, DaVinci, CapCut…) · 3D & VFX (Blender, Unreal…)
   - Her alanda ayrıca **Fırsatlar** (indirimler, ücretsiz eklentiler).
 - **Bölümler:** Gündem · Haberler · Videolar · Araçlar & modeller (GitHub + Hugging Face) · Makaleler · Topluluk (Hacker News + Reddit).
+- **“Bu nedir?”:** GitHub projeleri, Hugging Face modelleri ve demolar adlarının altında ne işe yaradıklarını Türkçe olarak söyler.
+  - Açıklama, projenin kendi sayfasından alınıp çevrilir.
+  - Modellerde ayrıca “Yazılı tariften müzik ya da ses üreten model” gibi sade bir tür etiketi vardır.
+  - Ayrıntı ekranında LoRA, MCP, GGUF gibi terimler **Terimler** başlığı altında kısaca açıklanır.
 - **Gündem:** günün özeti, *öne çıkanlar* (birden çok kaynağın aynı anda yazdığı haberler), son dakika, en çok konuşulanlar, son videolar; yanda yükselen konular, yeni araçlar ve modeller, takip listen ve yaklaşan etkinlikler.
 - **Takip listesi:** marka, model ya da kelime ekle (varsayılan: Suno, ElevenLabs, Udio, Sora, Midjourney). Yeni bir haberde geçtiğinde panelde, istersen masaüstü bildirimiyle ve sesli uyarıyla haber verir.
 - **Kaydedilenler:** üstteki yer imi simgesi.
@@ -131,6 +143,7 @@ build.js             statik derleyici: tek seferde tara + çevir + analiz et →
 lib/adapters.js      RSS/Atom, Hacker News, Reddit, YouTube, arXiv, Hugging Face, GitHub (arama, trend, sürüm)
 lib/classify.js      ilgi filtresi, Ses/Müzik/Görsel alanları ve konuları, fırsat tespiti, spam/uygunsuz içerik eleme
 lib/analyze.js       yükselen konular, çok kaynaklı haber kümeleri
+lib/about.js         “Bu nedir?”: repo, model ve demoların kendi açıklamaları (README, model kartı)
 lib/translate.js     Türkçe çeviri (önbellekli, hız sınırına saygılı)
 lib/brief.js         isteğe bağlı Claude özeti
 public/              arayüz — derleme adımı yok, saf ES modülleri

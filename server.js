@@ -16,6 +16,7 @@ import { analyze } from './lib/analyze.js';
 import { Secrets } from './lib/secrets.js';
 import { Briefer, sdkInstalled } from './lib/brief.js';
 import { Translator } from './lib/translate.js';
+import { About } from './lib/about.js';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 // SINYAL_DATA_DIR and SINYAL_NO_SWEEP exist for testing a second instance against a copy of the cache.
@@ -36,6 +37,7 @@ store.migrate(jobs);
 const secrets = new Secrets(DATA);
 const briefer = new Briefer(DATA, secrets);
 const translator = new Translator(store);
+const about = new About(store, secrets);
 const scheduler = new Scheduler(jobs, store, { secrets }, { concurrency: 6 });
 
 // ------------------------------------------------------------------ analysis + translation
@@ -56,12 +58,27 @@ setInterval(scheduleAnalysis, 10 * 60e3); // day buckets roll over even when qui
 let translateTimer = null;
 function translateSoon() {
   clearTimeout(translateTimer);
-  translateTimer = setTimeout(() => translator.run({
-    max: 150,
-    first: analysis.clusters.flatMap(c => c.ids), // featured stories before the rest
-    onBatch: changed => broadcast('tr', changed),
-  }), 1500);
+  translateTimer = setTimeout(async () => {
+    await translator.run({
+      max: 150,
+      first: analysis.clusters.flatMap(c => c.ids), // featured stories before the rest
+      onBatch: changed => broadcast('tr', changed),
+    });
+    await translator.runAbout({ max: 120, onBatch: changed => broadcast('about', slimAbout(Object.keys(changed))) });
+  }, 1500);
 }
+
+// "What is this" for repos and models: read new ones shortly after the boards change.
+const slimAbout = keys => Object.fromEntries(keys.map(k => [k, store.about[k]]).filter(([, a]) => a).map(([k, a]) => [k, { en: a.en || '', tr: a.tr || '', meta: a.meta || {} }]));
+let aboutTimer = null;
+function aboutSoon() {
+  clearTimeout(aboutTimer);
+  aboutTimer = setTimeout(async () => {
+    const changed = await about.refresh({ max: 40 }).catch(() => []);
+    if (changed.length) { broadcast('about', slimAbout(changed)); translateSoon(); }
+  }, 20e3);
+}
+setInterval(aboutSoon, 15 * 60e3);
 setInterval(translateSoon, 3 * 60e3);
 
 // ------------------------------------------------------------------ SSE hub
@@ -72,11 +89,24 @@ function broadcast(event, data) {
 }
 setInterval(() => broadcast('ping', { now: Date.now() }), 25e3);
 
+// Started from BASLAT.bat (--open), the server belongs to its app window: once the last
+// window has stayed closed for a little while it stops, so nothing keeps running in the
+// background. (A reload reconnects within seconds and keeps it alive.)
+const APP_SESSION = !PUBLIC && process.argv.includes('--open');
+let everConnected = false;
+let idleTimer = null;
+function watchClients() {
+  if (!APP_SESSION) return;
+  clearTimeout(idleTimer);
+  if (clients.size) { everConnected = true; return; }
+  if (everConnected) idleTimer = setTimeout(() => { if (!clients.size) shutdown('uygulama penceresi kapandı'); }, 25e3);
+}
+
 scheduler.on('status', st => broadcast('status', { source: st, busy: scheduler.busy }));
 scheduler.on('queue', () => broadcast('busy', scheduler.busy));
 scheduler.on('result', ({ job, fresh, boards, backfill }) => {
   if (fresh.length) broadcast('items', { items: fresh, backfill, source: job.id });
-  if (boards.length) broadcast('boards', Object.fromEntries(boards.map(b => [b, store.boards[b]])));
+  if (boards.length) { broadcast('boards', Object.fromEntries(boards.map(b => [b, store.boards[b]]))); aboutSoon(); }
   scheduleAnalysis();
 });
 
@@ -167,14 +197,24 @@ async function route(req, res) {
 
   if (p === '/api/state' && req.method === 'GET') {
     const days = Math.min(21, Math.max(1, Number(url.searchParams.get('days')) || 8));
-    return send(req, res, 200, { meta: meta(), items: store.list({ days }), boards: store.boards, analysis, sources: scheduler.snapshot(), events: readEvents(), brief: briefer.latest });
+    return send(req, res, 200, { meta: meta(), items: store.list({ days }), boards: store.boards, about: about.snapshot(), analysis, sources: scheduler.snapshot(), events: readEvents(), brief: briefer.latest });
   }
 
   if (p === '/api/stream' && req.method === 'GET') {
     sseOpen(res);
     res.write(`event: hello\ndata: ${JSON.stringify(meta())}\n\n`);
     clients.add(res);
-    req.on('close', () => clients.delete(res));
+    watchClients();
+    req.on('close', () => { clients.delete(res); watchClients(); });
+    return;
+  }
+
+  // The app's power button (this computer only): stop scanning and quit.
+  if (p === '/api/shutdown' && req.method === 'POST') {
+    if (PUBLIC) return send(req, res, 403, { error: 'Yayındaki sürüm buradan kapatılamaz.' });
+    send(req, res, 200, { ok: true });
+    broadcast('bye', {}); // every other open window shows "closed" too
+    setTimeout(() => shutdown('Kapat düğmesi'), 300);
     return;
   }
 
@@ -268,9 +308,10 @@ function listen(port, attempt = 0) {
     console.log(`\n  ▌SİNYAL ${VERSION}  ·  ses, müzik ve görsel teknoloji haberleri${PUBLIC ? '  ·  YAYIN MODU' : ''}`);
     console.log(`  ▌${jobs.length} kaynak izleniyor  ·  önbellekte ${store.items.size} haber`);
     console.log(`  ▌Panel: ${url}\n`);
-    if (process.argv.includes('--open')) openBrowser(url);
+    if (process.argv.includes('--open') && !process.env.SINYAL_NO_BROWSER) openBrowser(url);
     if (!process.env.SINYAL_NO_SWEEP) scheduler.start();
     translateSoon();
+    aboutSoon();
   });
 }
 
@@ -283,12 +324,12 @@ async function openBrowser(url) {
   spawn(cmd[0], cmd[1], { stdio: 'ignore', detached: true }).unref();
 }
 
-async function shutdown() {
-  console.log('\n  ▌kapatılıyor, önbellek kaydediliyor…');
+async function shutdown(reason) {
+  console.log(`\n  ▌kapatılıyor${typeof reason === 'string' ? ` (${reason})` : ''}, önbellek kaydediliyor…`);
   try { await store.save(); } catch { /* best effort */ }
   process.exit(0);
 }
-process.on('SIGINT', shutdown);
-process.on('SIGTERM', shutdown);
+process.on('SIGINT', () => shutdown());
+process.on('SIGTERM', () => shutdown());
 
 listen(PORT);

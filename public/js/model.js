@@ -22,6 +22,7 @@ export const S = {
   items: new Map(),
   list: [],
   boards: {},
+  about: {},
   analysis: { trends: {}, entities: [], clusters: [] },
   sources: [],
   events: [],
@@ -114,11 +115,31 @@ export function titleOf(it) {
 }
 
 export function summaryOf(it) {
-  if (lang !== 'tr' || isTurkishSource(it) || S.showOriginal.has(it.id)) return it.summary || '';
-  return it.tr?.s || S.localTr.get(it.id)?.s || it.summary || '';
+  const own = lang !== 'tr' || isTurkishSource(it) || S.showOriginal.has(it.id)
+    ? it.summary || ''
+    : it.tr?.s || S.localTr.get(it.id)?.s || it.summary || '';
+  // Repositories and models often come without a summary: use what their own page says.
+  return own || aboutText(aboutKeyOf(it), S.showOriginal.has(it.id));
 }
 
-export const isTranslated = it => lang === 'tr' && !isTurkishSource(it) && !!(it.tr?.t || it.tr?.s || S.localTr.has(it.id));
+export const isTranslated = it => lang === 'tr' && !isTurkishSource(it)
+  && !!(it.tr?.t || it.tr?.s || S.localTr.has(it.id) || (!it.summary && aboutOf(aboutKeyOf(it))?.tr));
+
+// ------------------------------------------------------------------ "what is this" (repos, models, demos)
+// Keys match lib/about.js: gh:owner/repo, hf:org/model, hfs:org/space.
+export function aboutKeyOf(it) {
+  if (!it) return '';
+  if (it.kind === 'repo' || it.kind === 'trend') return `gh:${it.title}`;
+  if (it.kind === 'model') return `hf:${it.title}`;
+  if (it.kind === 'release' && it.extra?.repo) return `gh:${it.extra.repo}`;
+  return '';
+}
+export const aboutOf = key => (key && S.about?.[key]) || null;
+export function aboutText(key, original = false) {
+  const a = aboutOf(key);
+  if (!a) return '';
+  return lang === 'tr' && !original ? a.tr || a.en || '' : a.en || '';
+}
 export const needsTranslation = it => lang === 'tr' && !isTurkishSource(it) && !it.tr && !S.localTr.has(it.id) && !!(it.title || it.summary);
 
 // ------------------------------------------------------------------ watchlist

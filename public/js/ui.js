@@ -1,6 +1,6 @@
 // Shared render helpers: icons, kickers, list rows, cards and toasts.
 import { $, esc, safeUrl, highlight } from './util.js';
-import { t } from './i18n.js';
+import { t, hasT } from './i18n.js';
 import { ago, compact } from './fmt.js';
 import { S, TOPIC_DOMAIN, titleOf, summaryOf, isNew, watchHits } from './model.js';
 import { platform, shareGlyph } from './mobile.js';
@@ -30,6 +30,7 @@ const ICONS = {
   chev: '<path d="m6 3.5 4.5 4.5L6 12.5"/>',
   sliders: '<path d="M2 4.5h7M12 4.5h2M2 11.5h2M7 11.5h7"/><circle cx="10.5" cy="4.5" r="1.6"/><circle cx="5.5" cy="11.5" r="1.6"/>',
   download: '<path d="M8 2.5v8M4.5 7 8 10.5 11.5 7M3 13.5h10"/>',
+  power: '<path d="M8 2v5.5"/><path d="M4.6 4.2a5 5 0 1 0 6.8 0"/>',
 };
 export const icon = (name, cls = 'i sm') => `<svg class="${cls}" viewBox="0 0 16 16" aria-hidden="true">${ICONS[name] || ''}</svg>`;
 
@@ -118,6 +119,26 @@ export function installCard({ dismissable = false, bare = false } = {}) {
   const later = dismissable ? `<button class="btn ghost" type="button" data-action="install-dismiss">${esc(t(action ? 'install.later' : 'install.ok'))}</button>` : '';
   return `<section class="install-card"><img class="app-ico" src="icons/icon-192.png" alt="" width="48" height="48">
     <div><h3>${esc(t('install.title'))}</h3><p>${esc(t('install.text'))}</p>${help}${action || later ? `<div class="install-actions">${action}${later}</div>` : ''}</div></section>`;
+}
+
+// One plain line that says what a repository, model or demo is ("Yazılı tariften müzik
+// üreten model · LoRA eki…"), from the facts lib/about.js read off its page.
+export function whatLabel(kind, about, { task = '', codeLang = '' } = {}) {
+  const m = about?.meta || {};
+  const k = m.kind || kind;
+  if (k === 'space') return t('what.space');
+  if (k === 'model') {
+    const base = String(m.base || '').split('/').pop();
+    if (m.lora) return base ? t('what.lora', { base }) : t('what.loraNoBase');
+    const tk = m.task || task;
+    const parts = [tk && hasT(`what.task.${tk}`) ? t(`what.task.${tk}`) : t('what.model')];
+    if (m.gguf) parts.push(t('what.gguf'));
+    else if (m.quant) parts.push(t('what.quant'));
+    if (base) parts.push(t('what.base', { base }));
+    return parts.join(' · ');
+  }
+  const l = m.lang || codeLang;
+  return l ? t('what.repoLang', { lang: l }) : t('what.repo');
 }
 
 export function empty(title, sub, loading = false) {

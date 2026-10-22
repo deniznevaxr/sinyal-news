@@ -2,10 +2,14 @@
 import { $, $$, esc, safeUrl, hostOf, translateUrl, DAY } from './util.js';
 import { t, lang } from './i18n.js';
 import { ago, agoLong, fullDate, compact, num } from './fmt.js';
-import { S, getItem, persist, titleOf, summaryOf, isTranslated, queryTerms, textMatch, score, inDomain } from './model.js';
-import { icon, kicker, tags, stat, domainOf, installCard } from './ui.js';
+import { S, getItem, persist, titleOf, summaryOf, isTranslated, queryTerms, textMatch, score, inDomain, aboutOf, aboutKeyOf, aboutText } from './model.js';
+import { icon, kicker, tags, stat, domainOf, installCard, whatLabel } from './ui.js';
+import { termsFor } from './glossary.js';
 import { tokensOf } from './text.js';
 import { phone, platform, dragToClose } from './mobile.js';
+
+// The local version (BASLAT.bat) can be shut down from the app; published copies cannot.
+export const canQuit = () => S.mode === 'live' && !!S.settings && !S.settings.public;
 
 // ------------------------------------------------------------------ layers
 // app.js listens here to keep the phone's back gesture in step with what is open.
@@ -84,15 +88,25 @@ const relList = list => `<ul class="d-related">${list.map(o => `<li><button type
 function drawerHTML(it) {
   const x = it.extra || {};
   const url = safeUrl(it.url);
-  const img = safeUrl(it.image);
+  // A repository's picture is only its owner's small avatar: not worth a big banner.
+  const img = it.kind === 'repo' || it.kind === 'trend' ? '' : safeUrl(it.image);
   const saved = S.saved.has(it.id);
   const translated = isTranslated(it);
   const showingOriginal = S.showOriginal.has(it.id);
   const isTr = (it.flags || []).includes('tr');
   const sum = summaryOf(it);
+  // Repositories, models and releases: say plainly what the thing is, and explain its jargon.
+  const isTool = ['repo', 'trend', 'model', 'release'].includes(it.kind);
+  const about = aboutOf(aboutKeyOf(it));
+  const license = about?.meta?.license || x.license || '';
+  const projectText = it.kind === 'release' ? aboutText(aboutKeyOf(it)) : ''; // a release summary is about the version, not the project
+  const what = isTool ? whatLabel(it.kind === 'model' ? 'model' : 'repo', about, { task: x.task, codeLang: x.lang }) : '';
+  const whatBlock = what ? `<div class="d-what">${icon(it.kind === 'model' ? 'cube' : 'code', 'i')}<div><span class="d-what-label">${esc(t('what.title'))}</span><b>${esc(what)}</b>${projectText ? `<span>${esc(projectText)}</span>` : ''}${license ? `<small>${esc(/^other$/i.test(license) ? t('what.licenseOther') : t('what.license', { l: license }))}</small>` : ''}</div></div>` : '';
+  const terms = isTool || it.kind === 'paper' ? termsFor(`${it.title} ${about?.en || ''} ${it.summary || ''} ${license}`) : [];
+  const termsBlock = terms.length ? `<div class="d-section"><h4>${esc(t('what.terms'))}</h4><div class="d-terms">${terms.map(term => `<p><b>${esc(term.label)}:</b> ${esc(term.text)}</p>`).join('')}</div></div>` : '';
   const canShare = !!url && typeof navigator.share === 'function' && (phone.matches || platform.ios || platform.android);
   const links = [
-    url && `<a class="btn primary" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${icon('ext')}${esc(t('act.open'))}</a>`,
+    url && `<a class="btn primary" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${icon('ext')}${esc(t(['repo', 'trend', 'model', 'release'].includes(it.kind) ? 'act.openPage' : 'act.open'))}</a>`,
     safeUrl(x.discussion) && x.discussion !== it.url && `<a class="btn" href="${esc(safeUrl(x.discussion))}" target="_blank" rel="noopener noreferrer">${icon('chat')}${esc(t('act.discussion'))}</a>`,
     safeUrl(x.code) && `<a class="btn" href="${esc(safeUrl(x.code))}" target="_blank" rel="noopener noreferrer">${icon('code')}${esc(t('act.code'))}</a>`,
     safeUrl(x.demo) && `<a class="btn" href="${esc(safeUrl(x.demo))}" target="_blank" rel="noopener noreferrer">${icon('play')}${esc(t('act.demo'))}</a>`,
@@ -122,10 +136,12 @@ function drawerHTML(it) {
     <div class="drawer-body">
       <h2 class="d-title">${esc(titleOf(it))}</h2>
       ${trNote}
+      ${whatBlock}
       ${img ? `<figure class="d-img"><img src="${esc(img)}" alt="" referrerpolicy="no-referrer" onerror="this.parentNode.remove()"></figure>` : ''}
-      ${sum ? `<p class="d-sum">${esc(sum)}</p>` : ''}
+      ${sum ? `<p class="d-sum">${esc(sum)}</p>` : isTool ? `<p class="d-sum d-muted">${esc(t('what.noText'))}</p>` : ''}
       <div class="d-actions">${links}</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin:-8px 0 18px">${tags(it)}</div>
+      ${termsBlock}
       <dl class="d-facts">${facts}</dl>
       ${same.length ? `<div class="d-section"><h4>${esc(t('drawer.related'))}</h4>${relList(same)}</div>` : ''}
       ${similar.length ? `<div class="d-section"><h4>${esc(t('drawer.similar'))}</h4>${relList(similar)}</div>` : ''}
@@ -269,6 +285,7 @@ export function moreBody() {
     <div class="sheet-set"><span>${esc(t('settings.language'))}</span>${seg('lang', [['tr', 'Türkçe'], ['en', 'English']], lang)}</div>
     <div class="sheet-set"><span>${esc(t('settings.theme'))}</span>${seg('set-theme', [['dark', t('settings.dark')], ['light', t('settings.light')], ['system', t('settings.system')]], S.prefs.theme)}</div>
     <button class="sheet-row" type="button" data-action="settings">${icon('sliders', 'i')}<span>${esc(t('more.settings'))}</span>${icon('chev', 'i sm chev')}</button>
+    ${canQuit() ? `<button class="sheet-row" type="button" data-action="quit">${icon('power', 'i')}<span>${esc(t('quit.button'))}</span></button>` : ''}
     ${installCard()}
     <div class="sheet-foot"><span class="live-dot" style="background:var(--live)"></span><span>${esc(updated)}${S.sources.length ? ` · ${esc(t('status.sources', { ok, n: S.sources.length }))}` : ''}</span></div>`;
 }
@@ -298,6 +315,7 @@ export function settingsBody() {
   return `<form data-form="settings" autocomplete="off">
     <div class="set-row"><div class="set-label">${esc(t('settings.app'))}</div>
       <div>${app.standalone ? `<span class="ok">● ${esc(t('settings.appRunning'))}</span>` : app.canInstall ? `<button class="btn sm primary" type="button" data-action="install">${esc(t('app.install'))}</button>` : ''}
+        ${canQuit() ? `<button class="btn sm" type="button" data-action="quit">${icon('power')}${esc(t('quit.button'))}</button><p>${esc(t('quit.note'))}</p>` : ''}
         <p>${esc(t('settings.appNote'))}</p>${appHelp}</div></div>
     <div class="set-row"><div class="set-label">${esc(t('settings.language'))}</div>
       <div>${seg('lang', [['tr', 'Türkçe'], ['en', 'English']], lang)}</div></div>

@@ -16,6 +16,7 @@ import { analyze } from './lib/analyze.js';
 import { Secrets } from './lib/secrets.js';
 import { Briefer } from './lib/brief.js';
 import { Translator } from './lib/translate.js';
+import { About } from './lib/about.js';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const DATA = process.env.SINYAL_DATA_DIR ? path.resolve(process.env.SINYAL_DATA_DIR) : path.join(ROOT, 'data');
@@ -55,15 +56,21 @@ if (due.length) {
   log(`tarama bitti · ${fresh} yeni haber${failed.length ? ` · hatalı: ${failed.join(', ')}` : ''}`);
 }
 
+// 1b. What new repositories and models are, in their own words (a capped number per run).
+const about = new About(store, secrets);
+if (!OFFLINE) {
+  const learned = await about.refresh({ max: 80 });
+  log(`açıklama: ${learned.length} araç ve model`);
+}
+
 // 2. Analyse, then translate (paced inside the translator): the multi-source stories the
 //    front page features go first, so a big backlog never leaves the headlines in English.
+const TRANSLATE_MAX = process.env.TRANSLATE_MAX !== undefined ? Number(process.env.TRANSLATE_MAX) : 400;
 const analysis = analyze(store.list());
 const translator = new Translator(store);
-const translated = await translator.run({
-  max: process.env.TRANSLATE_MAX !== undefined ? Number(process.env.TRANSLATE_MAX) : 400,
-  first: analysis.clusters.flatMap(c => c.ids),
-});
-log(`çeviri: ${translated} haber${translator.lastError ? ` · durdu: ${translator.lastError}` : ''}`);
+const translated = await translator.run({ max: TRANSLATE_MAX, first: analysis.clusters.flatMap(c => c.ids) });
+const describedTr = await translator.runAbout({ max: TRANSLATE_MAX });
+log(`çeviri: ${translated} haber, ${describedTr} açıklama${translator.lastError ? ` · durdu: ${translator.lastError}` : ''}`);
 
 // 3. (Optionally) brief.
 const briefer = new Briefer(DATA, secrets);
@@ -93,6 +100,7 @@ const snapshot = {
   },
   items: store.list({ days: 8 }),
   boards: store.boards,
+  about: about.snapshot(),
   analysis,
   sources: scheduler.snapshot().map(s => ({ ...s, running: false, queued: false })),
   events: existsSync(eventsFile) ? JSON.parse(readFileSync(eventsFile, 'utf8')).events || [] : [],

@@ -32,7 +32,7 @@ const STRINGS = {
     'time.now': 'şimdi', 'time.m': '{n} dk', 'time.h': '{n} sa', 'time.d': '{n} g', 'time.ago': '{t} önce',
     'time.minutesAgo': '{n} dakika önce', 'time.hoursAgo': '{n} saat önce', 'time.yesterday': 'dün', 'time.daysAgo': '{n} gün önce',
     'time.inDays': '{n} gün', 'time.days': 'gün', 'time.today': 'bugün', 'time.ongoing': 'şu an',
-    'act.open': 'Habere git', 'act.save': 'Kaydet', 'act.saved': 'Kaydedildi', 'act.copy': 'Bağlantıyı kopyala', 'act.original': 'Orijinalini göster',
+    'act.open': 'Habere git', 'act.openPage': 'Sayfasını aç', 'act.save': 'Kaydet', 'act.saved': 'Kaydedildi', 'act.copy': 'Bağlantıyı kopyala', 'act.original': 'Orijinalini göster',
     'act.translated': 'Türkçesini göster', 'act.discussion': 'Tartışma', 'act.code': 'Kod', 'act.demo': 'Demo', 'act.pdf': 'PDF', 'act.close': 'Kapat',
     'act.more': 'Daha fazla göster', 'act.add': 'Ekle', 'act.remove': 'Kaldır', 'act.readMore': 'Devamını oku', 'act.readLess': 'Daralt',
     'search.button': 'Ara…', 'search.placeholder': 'Haber, araç, model ya da konu ara…', 'search.empty': 'Sonuç yok.', 'search.hint': 'Enter ile aç · Esc ile kapat',
@@ -84,6 +84,27 @@ const STRINGS = {
     'install.button': 'Yükle', 'install.later': 'Daha sonra', 'install.ok': 'Tamam',
     'ptr.pull': 'Yenilemek için çek', 'ptr.release': 'Bırak, yenileyelim', 'ptr.loading': 'Yenileniyor…',
     'ptr.uptodate': 'Haberler güncel', 'ptr.next': 'Yeni haberler yaklaşık 20 dakikada bir gelir.',
+    'quit.button': 'SİNYAL’i kapat', 'quit.title': 'SİNYAL kapatılsın mı?', 'quit.confirm': 'Kapat',
+    'quit.text': 'Bu bilgisayardaki haber taraması da durur; arka planda hiçbir şey çalışmaz. Tekrar açmak için BASLAT.bat’a çift tıkla.',
+    'quit.note': 'Uygulama penceresini kapattığında da yarım dakika içinde kendiliğinden kapanır.',
+    'what.title': 'Bu nedir?', 'what.terms': 'Terimler', 'what.model': 'Yapay zekâ modeli',
+    'what.task.text-to-speech': 'Yazıyı sese çeviren yapay zekâ modeli (TTS)',
+    'what.task.automatic-speech-recognition': 'Konuşmayı yazıya döken yapay zekâ modeli',
+    'what.task.audio-to-audio': 'Sesi işleyen model (temizleme, ayırma, ses değiştirme)',
+    'what.task.audio-text-to-text': 'Sesi dinleyip yazıyla yanıt veren model',
+    'what.task.audio-classification': 'Sesleri tanıyıp sınıflandıran model',
+    'what.task.text-to-audio': 'Yazılı tariften müzik ya da ses üreten model',
+    'what.task.text-to-image': 'Yazılı tariften görsel üreten model',
+    'what.task.image-to-image': 'Görseli düzenleyen ya da dönüştüren model',
+    'what.task.text-to-video': 'Yazılı tariften video üreten model',
+    'what.task.image-to-video': 'Görselden video üreten model',
+    'what.task.image-to-3d': 'Görselden 3D model çıkaran model',
+    'what.lora': 'LoRA eki: {base} modeline yeni bir tarz ya da ses öğretir', 'what.loraNoBase': 'LoRA eki: bir modele yeni bir tarz ya da ses öğretir',
+    'what.gguf': 'bilgisayarda çalıştırmak için küçültülmüş sürüm (GGUF)', 'what.quant': 'daha az bellekle çalışan küçültülmüş sürüm',
+    'what.base': '{base} tabanlı', 'what.space': 'Tarayıcıda hemen deneyebileceğin demo',
+    'what.repo': 'Açık kaynak yazılım projesi', 'what.repoLang': '{lang} ile yazılmış açık kaynak proje', 'what.license': 'Lisans: {l}',
+    'what.noText': 'Bu projenin kendi açıklaması okunamadı; ne olduğunu yukarıdaki satır özetliyor.', 'what.licenseOther': 'Özel lisans: kullanım koşulları proje sayfasında',
+    'quit.done': 'SİNYAL kapatıldı', 'quit.doneText': 'Arka planda hiçbir şey çalışmıyor. Bu pencereyi kapatabilirsin.', 'quit.close': 'Pencereyi kapat',
   },
   en: {
     tagline: 'Sound · Music · Visual tech news',
@@ -115,7 +136,7 @@ const STRINGS = {
     'time.now': 'now', 'time.m': '{n}m', 'time.h': '{n}h', 'time.d': '{n}d', 'time.ago': '{t} ago',
     'time.minutesAgo': '{n} minutes ago', 'time.hoursAgo': '{n} hours ago', 'time.yesterday': 'yesterday', 'time.daysAgo': '{n} days ago',
     'time.inDays': '{n} days', 'time.days': 'days', 'time.today': 'today', 'time.ongoing': 'now',
-    'act.open': 'Open article', 'act.save': 'Save', 'act.saved': 'Saved', 'act.copy': 'Copy link', 'act.original': 'Show original',
+    'act.open': 'Open article', 'act.openPage': 'Open page', 'act.save': 'Save', 'act.saved': 'Saved', 'act.copy': 'Copy link', 'act.original': 'Show original',
     'act.translated': 'Show Turkish', 'act.discussion': 'Discussion', 'act.code': 'Code', 'act.demo': 'Demo', 'act.pdf': 'PDF', 'act.close': 'Close',
     'act.more': 'Show more', 'act.add': 'Add', 'act.remove': 'Remove', 'act.readMore': 'Read more', 'act.readLess': 'Show less',
     'search.button': 'Search…', 'search.placeholder': 'Search news, tools, models or topics…', 'search.empty': 'No results.', 'search.hint': 'Enter to open · Esc to close',
@@ -167,6 +188,27 @@ const STRINGS = {
     'install.button': 'Install', 'install.later': 'Later', 'install.ok': 'Got it',
     'ptr.pull': 'Pull to refresh', 'ptr.release': 'Release to refresh', 'ptr.loading': 'Refreshing…',
     'ptr.uptodate': 'You are up to date', 'ptr.next': 'New stories arrive about every 20 minutes.',
+    'quit.button': 'Quit SİNYAL', 'quit.title': 'Quit SİNYAL?', 'quit.confirm': 'Quit',
+    'quit.text': 'Scanning on this computer stops too; nothing keeps running in the background. Double-click BASLAT.bat to open it again.',
+    'quit.note': 'Closing the app window also shuts it down by itself within half a minute.',
+    'what.title': 'What is it?', 'what.terms': 'Terms', 'what.model': 'AI model',
+    'what.task.text-to-speech': 'AI model that reads text aloud (TTS)',
+    'what.task.automatic-speech-recognition': 'AI model that turns speech into text',
+    'what.task.audio-to-audio': 'Model that processes audio (clean-up, separation, voice change)',
+    'what.task.audio-text-to-text': 'Model that listens to audio and answers in text',
+    'what.task.audio-classification': 'Model that recognises and labels sounds',
+    'what.task.text-to-audio': 'Model that makes music or sound from a text prompt',
+    'what.task.text-to-image': 'Model that makes images from a text prompt',
+    'what.task.image-to-image': 'Model that edits or transforms images',
+    'what.task.text-to-video': 'Model that makes video from a text prompt',
+    'what.task.image-to-video': 'Model that turns an image into video',
+    'what.task.image-to-3d': 'Model that turns an image into a 3D model',
+    'what.lora': 'LoRA add-on: teaches {base} a new style or voice', 'what.loraNoBase': 'LoRA add-on: teaches a model a new style or voice',
+    'what.gguf': 'compact version for running on your own computer (GGUF)', 'what.quant': 'compact version that needs less memory',
+    'what.base': 'based on {base}', 'what.space': 'A demo you can try in your browser right away',
+    'what.repo': 'Open-source software project', 'what.repoLang': 'Open-source project written in {lang}', 'what.license': 'Licence: {l}',
+    'what.noText': 'The project’s own description could not be read; the line above says what it is.', 'what.licenseOther': 'Custom licence: terms on the project page',
+    'quit.done': 'SİNYAL has quit', 'quit.doneText': 'Nothing is running in the background. You can close this window.', 'quit.close': 'Close window',
   },
 };
 
@@ -177,6 +219,8 @@ export function setLang(l) {
   storage.set('lang', lang);
   document.documentElement.lang = lang;
 }
+
+export const hasT = key => key in STRINGS[lang] || key in STRINGS.tr;
 
 export function t(key, vars) {
   let s = STRINGS[lang][key] ?? STRINGS.tr[key] ?? key;

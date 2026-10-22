@@ -4,9 +4,9 @@ import { t } from './i18n.js';
 import { ago, agoLong, compact, dayMonth } from './fmt.js';
 import {
   S, DOMAINS, TOPICS_BY_DOMAIN, RANGES, feedItems, score, visible, inDomain, boardVisible, queryTerms,
-  topicCounts, titleOf, summaryOf, watchHits, needsTranslation,
+  topicCounts, titleOf, summaryOf, watchHits, needsTranslation, aboutOf, aboutText,
 } from './model.js';
-import { item, mini, video, empty, icon, kicker, tags, domainOf, installCard } from './ui.js';
+import { item, mini, video, empty, icon, kicker, tags, domainOf, installCard, whatLabel } from './ui.js';
 import { briefBlock } from './brief.js';
 import { deviceTranslatorState } from './translate.js';
 import { phone } from './mobile.js';
@@ -114,11 +114,18 @@ function aside(now) {
   const trendRows = trends.map((x, i) => `<button class="trend-row" type="button" data-action="search" data-v="${esc(x.label)}">
       <span class="trend-rank">${i + 1}</span><span class="trend-name">${esc(x.label)}</span><span class="trend-count">${x.today}</span><span class="trend-up">↑${x.ratio}×</span></button>`).join('');
 
-  const repos = (S.boards.ghRising7 || []).filter(boardVisible).slice(0, 3).map(r => ({ kind: 'repo', name: r.full_name, sub: r.description, val: `${compact(r.stars)} ★`, board: 'repo', key: r.full_name, d: r.domains?.[0] }));
+  // Each row says what the thing is: its own description (translated) or, failing that, a plain label.
+  const repos = (S.boards.ghRising7 || []).filter(boardVisible).slice(0, 3).map(r => ({
+    name: r.full_name, about: aboutText(`gh:${r.full_name}`) || r.description || whatLabel('repo', aboutOf(`gh:${r.full_name}`), { codeLang: r.lang }),
+    sub: r.topic ? t(`topic.${r.topic}`) : '', val: `${compact(r.stars)} ★`, board: 'repo', key: r.full_name, d: r.domains?.[0],
+  }));
   const models = Object.values(S.boards.hfModels || {}).flat().filter(m => boardVisible(m) && m.createdAt && now - m.createdAt < 21 * DAY)
-    .sort((a, b) => b.trending - a.trending).slice(0, 3).map(m => ({ kind: 'model', name: m.id, sub: m.topic ? t(`topic.${m.topic}`) : m.task || '', val: `${t('tools.trendScore')} ${m.trending}`, board: 'model', key: m.id, d: m.domain }));
+    .sort((a, b) => b.trending - a.trending).slice(0, 3).map(m => ({
+      name: m.id, about: aboutText(`hf:${m.id}`) || whatLabel('model', aboutOf(`hf:${m.id}`), { task: m.task }),
+      sub: m.topic ? t(`topic.${m.topic}`) : m.task || '', val: `${t('tools.trendScore')} ${m.trending}`, board: 'model', key: m.id, d: m.domain,
+    }));
   const tools = [...models, ...repos].map(x => `<button class="tool-row" type="button" data-action="open-board" data-board="${x.board}" data-key="${esc(x.key)}">
-      <span style="min-width:0"><span class="tool-name">${esc(x.name)}</span><span class="tool-sub">${x.d ? `<span class="dot d-${x.d}"></span>` : ''}${esc(x.sub || '')}</span></span><span class="tool-val">${esc(x.val)}</span></button>`).join('');
+      <span style="min-width:0"><span class="tool-name">${esc(x.name)}</span>${x.about ? `<span class="tool-about">${esc(x.about)}</span>` : ''}<span class="tool-sub">${x.d ? `<span class="dot d-${x.d}"></span>` : ''}${esc(x.sub || '')}</span></span><span class="tool-val">${esc(x.val)}</span></button>`).join('');
 
   const counts = Object.fromEntries(S.watch.map(w => [w, 0]));
   for (const it of S.list) {
@@ -216,7 +223,7 @@ function tools() {
       return `<div class="tool-item" data-action="open-board" data-board="${tab === 'repos' ? 'repo' : 'trend'}" data-key="${esc(r.full_name)}" data-nav>
         <span class="avatar"><img src="${esc(av)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"></span>
         <div style="min-width:0"><div class="tool-item-name"><span class="owner">${esc(owner)}/</span>${esc(r.full_name.split('/')[1])}</div>
-          <div class="tool-item-desc">${esc(r.description || '')}</div>
+          <div class="tool-item-desc">${esc(aboutText(`gh:${r.full_name}`) || r.description || whatLabel('repo', null, { codeLang: r.lang }))}</div>
           <div class="tool-item-meta">${d ? `<span class="kicker"><span class="dot d-${d}"></span>${esc(r.topic ? t(`topic.${r.topic}`) : t(`domain.${d}`))}</span>` : ''}${r.lang ? `<span>${esc(r.lang)}</span>` : ''}${r.created ? `<span>${esc(agoLong(r.created, now))}</span>` : ''}</div></div>
         <div class="tool-stats"><b>${compact(r.stars)} ★</b>${tab === 'repos' ? `<span class="up">+${compact(r.velocity)}${esc(t('tools.perDay'))}</span>` : `<span class="up">+${compact(r.starsPeriod)} ${esc(r.since === 'daily' ? t('tools.today') : t('tools.week'))}</span>`}</div>
       </div>`;
@@ -226,9 +233,12 @@ function tools() {
       .sort((a, b) => b.trending - a.trending).filter((m, i, arr) => arr.findIndex(x => x.id === m.id) === i).slice(0, limit);
     body = list.map(m => {
       const fresh = m.createdAt && now - m.createdAt < 14 * DAY;
+      const a = aboutOf(`hf:${m.id}`);
       return `<div class="tool-item" data-action="open-board" data-board="model" data-key="${esc(m.id)}" data-nav>
         <span class="avatar">${esc(m.id[0].toUpperCase())}</span>
         <div style="min-width:0"><div class="tool-item-name"><span class="owner">${esc(m.id.split('/')[0])}/</span>${esc(m.id.split('/').slice(1).join('/'))}</div>
+          <div class="tool-item-what">${esc(whatLabel('model', a, { task: m.task }))}</div>
+          ${aboutText(`hf:${m.id}`) ? `<div class="tool-item-desc">${esc(aboutText(`hf:${m.id}`))}</div>` : ''}
           <div class="tool-item-meta">${m.topic ? `<span class="kicker"><span class="dot d-${m.domain}"></span>${esc(t(`topic.${m.topic}`))}</span>` : `<span>${esc(m.task || '')}</span>`}${m.library ? `<span>${esc(m.library)}</span>` : ''}${m.license ? `<span>${esc(m.license)}</span>` : ''}${fresh ? `<span class="tag cov">${esc(t('tools.new'))}</span>` : ''}${m.createdAt ? `<span>${esc(agoLong(m.createdAt, now))}</span>` : ''}</div></div>
         <div class="tool-stats"><b>♥ ${compact(m.likes)}</b><span>${compact(m.downloads)} ${esc(t('tools.downloads'))}</span><span class="up">${esc(t('tools.trendScore'))} ${m.trending}</span></div>
       </div>`;
@@ -239,7 +249,7 @@ function tools() {
       <a class="tool-item" href="${esc(safeUrl(r.url))}" target="_blank" rel="noopener noreferrer" data-nav>
         <span class="avatar">${esc(r.repo.split('/')[1][0].toUpperCase())}</span>
         <div style="min-width:0"><div class="tool-item-name"><span class="owner">${esc(r.repo.split('/')[0])}/</span>${esc(r.repo.split('/')[1])}</div>
-          <div class="tool-item-desc">${esc(r.notes || '')}</div>
+          <div class="tool-item-desc">${esc(aboutText(`gh:${r.repo}`) || r.notes || '')}</div>
           <div class="tool-item-meta">${r.domains?.[0] ? `<span class="kicker"><span class="dot d-${r.domains[0]}"></span>${esc(r.topic ? t(`topic.${r.topic}`) : t(`domain.${r.domains[0]}`))}</span>` : ''}</div></div>
         <div class="tool-stats"><b>${esc(r.version)}</b><span>${esc(agoLong(r.date, now))}</span></div>
       </a>`).join('');
@@ -248,6 +258,7 @@ function tools() {
     body = `<div class="demos">${list.map(s => `
       <a class="demo" href="${esc(safeUrl(s.url))}" target="_blank" rel="noopener noreferrer" data-nav>
         <span class="demo-name">${esc(s.id.split('/')[1] || s.id)}</span>
+        <span class="demo-about">${esc(aboutText(`hfs:${s.id}`) || whatLabel('space'))}</span>
         <span class="demo-sub">${s.domains?.[0] ? `<span class="dot d-${s.domains[0]}"></span>` : ''}<span>${esc(s.id.split('/')[0])}</span><span>♥ ${compact(s.likes)}</span></span>
       </a>`).join('')}</div>`;
   }
@@ -314,9 +325,10 @@ export function boardItem(board, key) {
     if (!r) return null;
     const existing = S.list.find(i => (i.kind === 'repo' || i.kind === 'trend') && i.title === key);
     if (existing) return existing;
+    const a = aboutOf(`gh:${r.full_name}`);
     it = {
       id, kind: board, source: board === 'trend' ? 'ghtrending' : 'ghsearch', sourceName: 'GitHub', short: 'GH',
-      title: r.full_name, url: r.url, summary: r.description, author: r.full_name.split('/')[0], image: r.avatar || '',
+      title: r.full_name, url: r.url, summary: a?.en || r.description, ...(a?.tr ? { tr: { s: a.tr } } : {}), author: r.full_name.split('/')[0], image: r.avatar || '',
       published: r.created || Date.now(), firstSeen: Date.now(), topic: r.topic || null, topics: r.topic ? [r.topic] : [], domains: r.domains || [], flags: ['oss'], entities: [],
       metrics: { stars: r.stars, forks: r.forks, velocity: r.velocity, starsPeriod: r.starsPeriod }, extra: { lang: r.lang, topics: r.topics, license: r.license }, eng: 0.5, weight: 0.9,
     };
@@ -325,8 +337,9 @@ export function boardItem(board, key) {
     if (!m) return null;
     const existing = S.list.find(i => i.kind === 'model' && i.title === key);
     if (existing) return existing;
+    const a = aboutOf(`hf:${m.id}`);
     it = {
-      id, kind: 'model', source: 'hfmodels', sourceName: 'Hugging Face', short: 'HF', title: m.id, url: m.url, summary: '',
+      id, kind: 'model', source: 'hfmodels', sourceName: 'Hugging Face', short: 'HF', title: m.id, url: m.url, summary: a?.en || '', ...(a?.tr ? { tr: { s: a.tr } } : {}),
       author: m.id.split('/')[0], published: m.createdAt || Date.now(), firstSeen: Date.now(), topic: m.topic, topics: [m.topic], domains: [m.domain], flags: [], entities: [],
       metrics: { likes: m.likes, downloads: m.downloads, trending: m.trending }, extra: { task: m.task, library: m.library, license: m.license }, eng: 0.5, weight: 0.95,
     };
